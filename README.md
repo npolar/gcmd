@@ -1,12 +1,11 @@
-= Ruby GCMD library
+# Ruby GCMD library
 A set of classes for working with NASA's Global Change Master Directory
 
-== DIF
+## DIF
 Use [Gcmd::Dif]() to parse and create DIF (dataset metadata) XML documents 
 
-== KMS (Keyword Management System)
+## KMS (Keyword Management System)
 * Gcmd::Http
 
-== Requirements
+## Requirements
 * Ruby >= 1.9.3
-
