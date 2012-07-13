@@ -4,12 +4,15 @@ A set of classes for working with NASA's [Global Change Master Directory](http:/
 ## DIF
 Use [Gcmd::Dif]() to parse and create [DIF](http://gcmd.gsfc.nasa.gov/User/difguide/) (dataset metadata) XML documents. 
 
-## HTTP service
+## HTTP services
 
-## KMS (Keyword Management System)
+### Keyword Management System
+* Gcmd::Concepts
+
+### HTTP client
 * Gcmd::Http
-## 
 
+## About
 
-## Requirements
+### Requirements
 * Ruby >= 1.9.3
