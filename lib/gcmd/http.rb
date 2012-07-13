@@ -1,3 +1,5 @@
+require "gcmd/exception"
+
 require "faraday"
 require "faraday_middleware"
 require "rack/cache"
