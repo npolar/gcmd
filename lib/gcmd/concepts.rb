@@ -52,7 +52,9 @@ module Gcmd
     def add_concepts_from_cache
       (["root"]+ROOT_SCHEMES).each do |scheme|
         filename = File.join(cache, version, scheme)
-          addConcept(scheme, filename)
+          if File.exists? filename
+            addConcept(scheme, filename)
+          end
       end
     end
 
@@ -101,6 +103,7 @@ module Gcmd
     def root
       narrower("root").sort
     end
+
     def fetch_all
       f = []
       version = VERSION
@@ -140,7 +143,7 @@ module Gcmd
     end
 
     def schemes(scheme="root")
-      if "root" and false == concept?("root")
+      if "root" == scheme and false == concept?("root")
         return ROOT_SCHEMES
       end
       unless concept? scheme
