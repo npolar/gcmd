@@ -4,7 +4,7 @@ require "gcmd/http"
 # Thanks to https://github.com/intridea/oauth2/blob/master/spec/oauth2/client_spec.rb
 
 ENV.delete "GCMD_HTTP_PASSWORD"
-ENV.delete "XGCMD_HTTP_USERNAME"
+ENV.delete "GCMD_HTTP_USERNAME"
 
 Faraday.default_adapter = :test
 
@@ -44,27 +44,31 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"></rdf:RDF>']}
   end
 
   context "#get" do
-    it "returns a Faraday::Response" do
+    it "returns body as string" do
+      subject.get("/rdf").should =~ /<rdf:RDF/
+      subject.response.status.should == 200
+      subject.response.headers["Content-Type"].should == "application/rdf+xml"
+    end
+
+    it "stores a Faraday::Response" do
       response = subject.get("/rdf")
-      response.class.should == Faraday::Response
-      response.body.should =~ /<rdf:RDF/
-      response.status.should == 200
-      response.headers["Content-Type"].should == "application/rdf+xml"
+      subject.response.class.should == Faraday::Response
     end
 
     it "appends paths to base URI" do
+      # seems to work only if base URI is host
       response = subject.get("/rdf")
-      response.to_hash[:url].to_s.should == Gcmd::Http::BASE+"/rdf"
+      subject.response.to_hash[:url].to_s.should == Gcmd::Http::BASE+"/rdf"
     end
 
     it "ignores base if path starts with http(s)" do
       response = subject.get("https://example.com/rdf")
-      response.to_hash[:url].to_s.should == ("https://example.com/rdf")
+      subject.response.to_hash[:url].to_s.should == ("https://example.com/rdf")
     end
 
     it "sends Basic Authorization" do
       response = subject.get("/rdf")
-      response.to_hash[:request_headers].should == {"Authorization"=>"Basic YmluZ286YmFuZ28="}
+      subject.response.to_hash[:request_headers].should == {"Authorization"=>"Basic YmluZ286YmFuZ28="}
     end
 
     it "should send If-None-Match"

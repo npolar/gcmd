@@ -9,12 +9,11 @@ module Gcmd
 
     BASE = "http://gcmdservices.gsfc.nasa.gov"
 
-    CONCEPTS = BASE + "/kms/concepts"
-
-    OPTS = { :request =>
-      { "Agent" => "#{self.name}" }
+    OPTS = {
+      # :request =>
+      # { "Agent" => "#{self.name}" }
     }
-
+    attr_reader :response
     attr_writer :username, :password
 
     def initialize(base=BASE, opts={}, &builder)
@@ -52,12 +51,12 @@ module Gcmd
         raise Exception, "Please provide username/password for #{uri}"
       end
 
-      response = @client.get(uri)
+      @response = @client.get(uri)
 
       unless [200, 304].include? response.status
-        raise Exception, "GET #{uri} failed with status: #{response.status}"
+        raise Exception, "GET #{connection.url_prefix}#{uri} failed with status: #{response.status}"
       end
-      response
+      @response.body
     end
 
     def host
