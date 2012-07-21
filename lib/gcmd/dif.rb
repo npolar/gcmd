@@ -297,7 +297,7 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
     end
     
     def to_json
-      JSON.pretty_generate( attributes )
+      attributes.to_json
     end
     
     def to_xml
@@ -620,8 +620,8 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
           
           #<xs:element ref="Data_Resolution" minOccurs="0" maxOccurs="unbounded"/>
           attributes["Data_Resolution"].each do | data_resolution |
-            xml.Latitude_Resolution data_resolution["Latitude_Resolution"]
-            xml.Longitude_Resolution data_resolution["Longitude_Resolution"]
+            xml.Latitude_Resolution data_resolution["Latitude_Resolution"] if data_resolution.key? "Latitude_Resolution"
+            xml.Longitude_Resolution data_resolution["Longitude_Resolution"] if data_resolution.key? "Longitude_Resolution"
             
             #<xs:element ref="Horizontal_Resolution_Range" minOccurs="0" maxOccurs="1"/>
             #<xs:element ref="Vertical_Resolution" minOccurs="0" maxOccurs="1"/>
