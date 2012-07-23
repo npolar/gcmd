@@ -60,7 +60,7 @@ module Gcmd
 
     def concept(scheme)
       unless concept? scheme
-        @concept[scheme] = get scheme
+        @concept[scheme] = get("/#{scheme}")
       end
       @concept[scheme]
     end
