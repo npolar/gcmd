@@ -24,11 +24,11 @@ module Gcmd
       "verticalresolutionrange", "temporalresolutionrange"].sort
 
     attr_accessor :base, :cache, :http
-
+    
     def initialize(base=BASE, cache=CACHE)
       @base = base
       @cache = cache
-      @http = Gcmd::Http.new(base)
+      @http = Http.new(base)
 
       unless false == cache
         add_concepts_from_cache
@@ -69,6 +69,12 @@ module Gcmd
       @concept.respond_to? :key? and @concept.key? scheme
     end
 
+    def filter(scheme, q, range = 0..9)
+      q = q.gsub(/\W/, "")
+      regexp = /#{q}/ui
+      narrower(scheme).select {|c| c[1] =~ regexp }[range]
+    end
+
     def get(uri)
       http.get(uri)
     end
@@ -89,6 +95,11 @@ module Gcmd
       narrower("sciencekeywords")
     end
 
+    def providers
+      narrower("providers")
+    end
+
+
     def narrower(scheme="root")
       ng = Nokogiri::XML concept(scheme)
       if "root" == scheme
@@ -98,6 +109,10 @@ module Gcmd
       end
       r = r.map {|r| [r.xpath("@rdf:about").to_s , r.xpath("./skos:prefLabel[@xml:lang='en']").text ]}
       r.select {|r| r[1] != "Trash Can" }
+    end
+
+    def narrower_names(scheme="root")
+      narrower(scheme).map {|c|c[1]}
     end
 
     def root
