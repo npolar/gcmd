@@ -8,8 +8,8 @@ module Gcmd
     BASE = "http://gcmdservices.gsfc.nasa.gov"
 
     OPTS = {
-      # :request =>
-      # { "Agent" => "#{self.name}" }
+      :request =>
+        { "Agent" => "#{self.name}" }
     }
     attr_reader :response
     attr_writer :username, :password

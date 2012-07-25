@@ -18,4 +18,4 @@ Use [Gcmd::Dif]() to parse and create [DIF](http://gcmd.gsfc.nasa.gov/User/difgu
 * Ruby >= 1.9.3
 
 ### Credits
-* [Directory Interchange Format XML Schema](http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd)
+* NASA/GCMD for [Directory Interchange Format XML Schema](http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd)

@@ -69,7 +69,7 @@ module Gcmd
       @concept.respond_to? :key? and @concept.key? scheme
     end
 
-    def filter(scheme, q, range = 0..9)
+    def filter(scheme, q, range = 0..99)
       q = q.gsub(/\W/, "")
       regexp = /#{q}/ui
       narrower(scheme).select {|c| c[1] =~ regexp }[range]
