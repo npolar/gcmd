@@ -24,6 +24,8 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   ISO_TOPICS = ["STRUCTURE", "BIOTA", "CLIMATOLOGY/METEOROLOGY/ATMOSPHERE", "FARMING", "GEOSCIENTIFIC INFORMATION", "TRANSPORTATION", "PLANNING CADASTRE", "INTELLIGENCE/MILITARY", "ELEVATION", "ENVIRONMENT", "LOCATION", "IMAGERY/BASE MAPS/EARTH COVER", "SOCIETY", "BOUNDARIES", "ECONOMY", "UTILITIES/COMMUNICATIONS", "HEALTH", "INLAND WATERS", "OCEANS"].sort
 
+  NO_PROVIDERS = ["NO/CRYOCLIM", "NO/IMR", "NO/MET", "NO/MF/IMR", "NO/MPE/NVE", "NO/NGU", "NO/NILU", "NO/NINA", "NO/NIVA", "NO/NIVA/AKVAPLAN", "NO/NMA", "NO/NMDC/IMR", "NO/NPCA/SOE", "NO/NPI", "NO/NR", "NO/SN"]
+
   def concept(scheme, version="Jun122012")
     File.join(File.dirname(__FILE__), "../../lib/gcmd/_concepts/", version, scheme)
   end
@@ -55,6 +57,17 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     it "should list ISO Topic Categories" do
       subject.isotopiccategory.map {|c| c[1]}.sort.should == ISO_TOPICS
     end
+  end
+
+  context "#providers" do
+    it "should list providers" do
+      subject.providers.map {|c| c[1]}.sort.last.should == "ZURICH/GEOG"
+    end
+
+    it "select ^NO/" do
+      subject.providers.select {|c| c[1] =~ /^NO\//}.map {|c| c[1]}.sort.should == NO_PROVIDERS
+    end
+
   end
 
   context "#root" do
