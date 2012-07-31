@@ -37,11 +37,6 @@ module Gcmd
     # Excluded in JSON export
     EXCLUDED = ["Fax", "Postal_Code", "Phone", "Multimedia_Sample", "Paleo_Temporal_Coverage"]
     
-    ISO_TOPIC_CATEGORIES = ["Farming", "Biota", "Boundaries", "Climatology/Meteorology/Atmosphere", "Economy", "Elevation",
-      "Environment", "Geoscientific Information", "Health", "Imagery/Base Maps/Earth Cover", "Intelligence/Military",
-      "Inland Waters", "Location", "Oceans", "Planning Cadastre", "Society", "Structure", "Transportation",
-      "Utilities/Communications"]
-        
     NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
     
     RECOMMENDED = ["DIF_Creation_Date", "DIF_Revision_History", "Future_DIF_Review_Date", "IDN_Node", "Keyword", "Last_DIF_Revision_Date", "Multimedia_Sample", "Parent_DIF", "Reference"]
