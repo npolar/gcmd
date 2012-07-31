@@ -153,10 +153,6 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       self.attributes = load(attr)
       self.document = Nokogiri::XML::Document.parse(self.class.empty_dif_xml)
     end
-
-    #def []
-    #
-    #end
     
     def sequence(element)
       if "DIF" == element # optimization
