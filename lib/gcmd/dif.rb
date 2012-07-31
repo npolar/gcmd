@@ -219,10 +219,12 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
         end
         
         o = document_to_object
-  
-        if o.is_a? Hash
-          o = json_skeleton.merge(o)
-        end
+        
+        # Merge each DIF with the skeleton to get a complete tag representation
+        
+        #o.each_with_index do |item, index|
+        #  o[index] = json_skeleton.merge(item)
+        #end
         
         self.attributes = o
       end
@@ -282,13 +284,8 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
         json_data = hash_from_nokogiri_xml_element( node.children )
         obj << json_data
       end
-          
-      if obj.size == 1
-        obj.first
-      else
-        obj
-      end
-      
+        
+      obj  
     end
     
     def to_json
