@@ -8,25 +8,25 @@ module Gcmd
   
   # DIF is a XML-based metadata specification used by NASA's Global Change Master Directory (GCMD)
   #
-  # @link DIF Guide: http://gcmd.gsfc.nasa.gov/User/difguide/difman.html
-  # @link DIF XML Schema: http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd
-  # @link About GCDM: http://gcmd.nasa.gov/Aboutus/
+  # @see http://gcmd.gsfc.nasa.gov/User/difguide/difman.html DIF Guide
+  # @see http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd DIF XML Schema
+  # @see http://gcmd.nasa.gov/Aboutus/ About GCDM
   #
   # Gcmd::Dif contains methods for
   # - loading DIF XML
   # - converting DIF XML to a Ruby Hash object
   # - exporting attributes Hash to DIF XML
   # - validating DIF XML
-  # [@todo - transforming DIF XML using XSLT]
+  #
+  # @todo transforming DIF XML using XSLT
   #
   # DIF XML may contain a number of controlled vocabularies, used to be called "valids". 
-  # Note: DIF XML is limited to 1 record per XML document, but is often packed in containers like OAI-PMH.
-  # Gcmd::Dif can load DIF XML even if packed in a container (@see #dif_xpath), but beware on #to_xml - this currently
-  # only works for 1 DIF document
   #
   # @author Ruben Dens
   # @author Conrad Helgeland
-  # @license GPL http://www.gnu.org/licenses/gpl.html
+  #
+  # [Project License]
+  # This project is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
   class Dif
     
     # 17 highly recommended DIF fields
@@ -61,38 +61,34 @@ module Gcmd
     FIELDS = REQUIRED + HIGHLY_RECOMMENDED + RECOMMENDED
 
     WANTED = REQUIRED + HIGHLY_RECOMMENDED - EXCLUDED + WANTED_RECOMMENDED
-    
-    
+      
     # http://nokogiri.org/Nokogiri/XML/Document.html
     attr_accessor :document
     
     # Hash
     #attr_accessor :attributes
     
-    #
     attr_accessor :dif_xpath
   
     # Convert DIF XML to Ruby object
+    # @todo use future #load
     def self.document_to_object(source, dif_xpath = XPATH)
-      dif = self.new
+      dif = self.new      
       
-      # FIXME use future #load
       dif.dif_xpath = dif_xpath
       dif.load_xml( source )  
       
       dif.document_to_object
     end
     
-    #
     # Convert DIF XML to JSON
-    #
+
     def self.to_json(source, dif_xpath = XPATH)
       JSON.pretty_generate(self.document_to_object(source, dif_xpath = XPATH))
     end
     
-    #
     # Import DIF XML and export to DIF XML
-    #
+
     def self.to_xml(source)
       dif = self.new
       dif.load_xml(source)
@@ -114,9 +110,8 @@ module Gcmd
       dif.to_json
     end
     
-    #
     # Validate DIF XML
-    #
+
     def self.validate_xml(source, dif_xpath = XPATH)
       dif = self.new
       dif.dif_xpath = dif_xpath
@@ -125,8 +120,9 @@ module Gcmd
     end
     
     def self.empty_dif_xml(version=Gcmd::Dif::VERSION)
-      xml = '<DIF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="'+ Gcmd::Dif::NAMESPACE["dif"] +'"
-xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v'+ version +'.xsd"></DIF>'
+      xml = '<DIF xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="'+ Gcmd::Dif::NAMESPACE["dif"] +
+            '"xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/Aboutus/xml/dif/dif_v'+
+            version +'.xsd"></DIF>'
     end
     
     def self.sequence(element = "DIF")
@@ -162,10 +158,9 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       end
     end
     
-    #
     # Calculate DIF element's multiplicity from XML Schema.
     # Cool, but a bit inefficient
-    #
+
     def multiplicity(name, parent = "DIF")
       res = schema.xpath("//xs:element[@name = '#{parent}']/xs:complexType/xs:sequence/xs:element[@ref='#{name}']", { "xs" => "http://www.w3.org/2001/XMLSchema"})
       unless res.size == 1
@@ -181,11 +176,11 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       
       [minOccurs.to_i, maxOccurs.to_i]
     end
-    
+
     def minOccurs(name)
       multiplicity(name)[0]
     end
-    
+
     def maxOccurs(name)
       multiplicity(name)[1]
     end
@@ -198,9 +193,9 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       end
       json_skeleton.merge(hash)
     end
-    #
+
     # Load DIF XML from source (filename/string, or URI)
-    #
+
     def load_xml( source, uri = false )
       unless source.nil?
         if uri or source =~ /^http(s)?\:\/\//
@@ -224,13 +219,10 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
         
         self.attributes = o
       end
-
-      
     end
-    
-    #
+
     # Load DIF JSON from source (filename/string, or URI)
-    #
+
     def load_json( source, uri = false )
       raise "Not implemented"
     end
@@ -268,9 +260,7 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       end
     end
     
-    #
     # Detect DIF tags in the XML
-    #
   
     def document_to_object
       obj = []
@@ -300,10 +290,8 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       #end
     end
     
-    #
     # Return true if valid dif
-    #
-  
+    
     def valid?
       begin
         errors = validate
@@ -323,10 +311,8 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       
     end
     
-    #
     # Validate dif entries and catch errors in an array
-    #
-  
+    
     def validate_xml
       dif_errors = []
   
@@ -344,19 +330,17 @@ xsi:schemaLocation="'+ Gcmd::Dif::NAMESPACE["dif"] +' http://gcmd.nasa.gov/About
       document = Nokogiri::XML::Document.parse(to_xml)
       errs = schema.validate( document )
     end
-  
-    #
+    
     # Xpath for dif nodes
-    #
-  
+    
     def dif_xpath
       #'//dif:DIF[dif:Entry_ID="org.polarresearch-452"]' #
       XPATH
     end
   
-    #
     # Get the dif schema in use
-    # @FIXME Check metadata version in XML
+    # @todo Check metadata version in XML
+    
     def xsd(version=VERSION)
       
       if version == VERSION
