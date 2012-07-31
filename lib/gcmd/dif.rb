@@ -177,10 +177,12 @@ module Gcmd
       [minOccurs.to_i, maxOccurs.to_i]
     end
 
+    # @see #multiplicity
     def minOccurs(name)
       multiplicity(name)[0]
     end
-
+    
+    # @see #multiplicity
     def maxOccurs(name)
       multiplicity(name)[1]
     end
@@ -461,53 +463,51 @@ module Gcmd
               p["Role"].each do | role |
                 xml.Role role
               end
+              
               xml.First_Name p["First_Name"]
               xml.Middle_Name p["Middle_Name"]
               xml.Last_Name p["Last_Name"]
 
               p["Email"].each do | email|
                 xml.Email email
-              end
-              
+              end              
             }
-            end
-            #<xs:element name="Personnel">
-            #  <xs:complexType>
-            #     <xs:sequence>
-            #        <xs:element ref="Role" minOccurs="1" maxOccurs="unbounded"/>
-            #        <xs:element ref="First_Name" minOccurs="0" maxOccurs="1"/>
-            #        <xs:element ref="Middle_Name" minOccurs="0" maxOccurs="1"/>
-            #        <xs:element ref="Last_Name" minOccurs="1" maxOccurs="1"/>
-            #        <xs:element ref="Email" minOccurs="0" maxOccurs="unbounded"/>
-            #        <xs:element ref="Phone" minOccurs="0" maxOccurs="unbounded"/>
-            #        <xs:element ref="Fax" minOccurs="0" maxOccurs="unbounded"/>
-            #        <xs:element ref="Contact_Address" minOccurs="0" maxOccurs="1"/>
-            #     </xs:sequence>
-            #  </xs:complexType>
-            #</xs:element>
-            
+          end
           
+          #<xs:element name="Personnel">
+          #  <xs:complexType>
+          #     <xs:sequence>
+          #        <xs:element ref="Role" minOccurs="1" maxOccurs="unbounded"/>
+          #        <xs:element ref="First_Name" minOccurs="0" maxOccurs="1"/>
+          #        <xs:element ref="Middle_Name" minOccurs="0" maxOccurs="1"/>
+          #        <xs:element ref="Last_Name" minOccurs="1" maxOccurs="1"/>
+          #        <xs:element ref="Email" minOccurs="0" maxOccurs="unbounded"/>
+          #        <xs:element ref="Phone" minOccurs="0" maxOccurs="unbounded"/>
+          #        <xs:element ref="Fax" minOccurs="0" maxOccurs="unbounded"/>
+          #        <xs:element ref="Contact_Address" minOccurs="0" maxOccurs="1"/>
+          #     </xs:sequence>
+          #  </xs:complexType>
+          #</xs:element>          
         
-          # Discipline {}
-#          <xs:element name="Discipline">
-#   <xs:complexType>
-#      <xs:sequence>
-#         <xs:element ref="Discipline_Name" minOccurs="1" maxOccurs="1"/>
-#         <xs:element ref="Subdiscipline" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Detailed_Subdiscipline" minOccurs="0" maxOccurs="1"/>
-#      </xs:sequence>
-#   </xs:complexType>
-#</xs:element>
+          #Discipline {}
+          #<xs:element name="Discipline">
+          #   <xs:complexType>
+          #      <xs:sequence>
+          #         <xs:element ref="Discipline_Name" minOccurs="1" maxOccurs="1"/>
+          #         <xs:element ref="Subdiscipline" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Detailed_Subdiscipline" minOccurs="0" maxOccurs="1"/>
+          #      </xs:sequence>
+          #   </xs:complexType>
+          #</xs:element>
           
-          # The <Parameters> field consists of a 7-level hierarchical classification of science keywords
-          
+          # The <Parameters> field consists of a 7-level hierarchical classification of science keywords          
             
           if attributes["Parameters"].nil?
             attributes["Parameters"] = [skeleton("Parameters")]
-          end       
+          end
+          
           attributes["Parameters"].each do | p |
-            xml.Parameters {
-            
+            xml.Parameters {            
               xml.Category p["Category"]
               xml.Topic p["Topic"]
               xml.Term p["Term"]
@@ -516,13 +516,13 @@ module Gcmd
               xml.Variable_Level_3 p["Variable_Level_3"] if p["Variable_Level_3"]
               xml.Detailed_Variable p["Detailed_Variable"] if p["Detailed_Variable"]              
             }
-          end
-            
+          end            
           
           #The <ISO_Topic_Category> field is used to identify the keywords in the ISO 19115 - Geographic Information Metadata (http://www.isotc211.org/) 
           unless attributes["ISO_Topic_Category"].any?
             attributes["ISO_Topic_Category"] = [""] # Required element
-          end         
+          end
+          
           attributes["ISO_Topic_Category"].each do | tc|
             xml.ISO_Topic_Category tc
           end
@@ -551,8 +551,7 @@ module Gcmd
             }
           
           end
-
-          #        
+          
           # <xs:element ref="Temporal_Coverage" minOccurs="0" maxOccurs="unbounded"/>
           attributes["Temporal_Coverage"].each do | t |
             xml.Temporal_Coverage {
@@ -561,14 +560,13 @@ module Gcmd
               
             }
           end
-            
+         
           #<xs:element ref="Paleo_Temporal_Coverage" minOccurs="0" maxOccurs="unbounded"/>
-
-                   
+          
           #<xs:element ref="Data_Set_Progress" minOccurs="0" maxOccurs="1"/>
           xml.Data_Set_Progress attributes["Data_Set_Progress"]
           
-           #<xs:element ref="Spatial_Coverage" minOccurs="0" maxOccurs="unbounded"/>
+          #<xs:element ref="Spatial_Coverage" minOccurs="0" maxOccurs="unbounded"/>
           attributes["Spatial_Coverage"].each do | s |
             xml.Spatial_Coverage {
               xml.Southernmost_Latitude s["Southernmost_Latitude"]
@@ -605,7 +603,7 @@ module Gcmd
           
           #<xs:element ref="Project" minOccurs="0" maxOccurs="unbounded"/>
           attributes["Project"].each do | project |
-             xml.Project {
+            xml.Project {
               xml.Short_Name project["Short_Name"] 
               xml.Long_Name project["Long_Name"]
             }
@@ -628,24 +626,19 @@ module Gcmd
           unless attributes["Data_Center"].any?
             attributes["Data_Center"] = [skeleton("Data_Center")]
           end
-          attributes["Data_Center"].each do | data_center |
           
-          
-          
-          xml.Data_Center {
-            
-            xml.Data_Center_Name {
-              xml.Short_Name data_center["Data_Center_Name"]["Short_Name"]  if data_center["Data_Center_Name"]
-              xml.Long_Name data_center["Data_Center_Name"]["Long_Name"] if data_center["Data_Center_Name"]
+          attributes["Data_Center"].each do | data_center |                     
+            xml.Data_Center {              
+              xml.Data_Center_Name {
+                xml.Short_Name data_center["Data_Center_Name"]["Short_Name"]  if data_center["Data_Center_Name"]
+                xml.Long_Name data_center["Data_Center_Name"]["Long_Name"] if data_center["Data_Center_Name"]
+              }
+              
+              xml.Data_Center_URL data_center["Data_Center_URL"]
+              xml.Data_Set_ID data_center["Data_Set_ID"]
+              
+              build_personnel(data_center["Personnel"], xml)
             }
-            
-            xml.Data_Center_URL data_center["Data_Center_URL"]
-            xml.Data_Set_ID data_center["Data_Set_ID"]
-            
-            build_personnel(data_center["Personnel"], xml)
-            
-
-          }
           end
           
           attributes["Distribution"].each do | distribution |
@@ -654,29 +647,28 @@ module Gcmd
             xml.Distribution_Format distribution["Distribution_Format"]
           end
   
-          # Reference []
-          
-#          <xs:element name="Reference">
-#   <xs:complexType mixed="true">
-#      <xs:sequence>
-#         <xs:element ref="Author" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Publication_Date" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Title" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Series" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Edition" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Volume" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Issue" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Report_Number" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Publication_Place" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Publisher" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Pages" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="ISBN" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="DOI" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Online_Resource" minOccurs="0" maxOccurs="1"/>
-#         <xs:element ref="Other_Reference_Details" minOccurs="0" maxOccurs="1"/>
-#      </xs:sequence>
-#   </xs:complexType>
-#</xs:element>
+          # Reference []          
+          #<xs:element name="Reference">
+          #   <xs:complexType mixed="true">
+          #      <xs:sequence>
+          #         <xs:element ref="Author" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Publication_Date" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Title" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Series" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Edition" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Volume" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Issue" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Report_Number" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Publication_Place" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Publisher" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Pages" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="ISBN" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="DOI" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Online_Resource" minOccurs="0" maxOccurs="1"/>
+          #         <xs:element ref="Other_Reference_Details" minOccurs="0" maxOccurs="1"/>
+          #      </xs:sequence>
+          #   </xs:complexType>
+          #</xs:element>
 
           if attributes["Summary"]["Abstract"].nil?
             xml.Summary {
@@ -690,28 +682,28 @@ module Gcmd
             }
           end
           
-    
-          attributes["Related_URL"].each do | related_url |
+          attributes["Related_URL"].each do | related_url |     
             
-          
-          xml.Related_URL {
-            unless related_url["URL_Content_Type"].nil?
-              xml.URL_Content_Type {
-                xml.Type related_url["URL_Content_Type"]["Type"] unless related_url["URL_Content_Type"]["Type"].nil?
-                xml.Subtype related_url["URL_Content_Type"]["Subtype"] unless related_url["URL_Content_Type"]["Subtype"].nil?
-              }
-            end
-
-            if related_url["URL"].is_a? String
-              related_url["URL"] = [related_url["URL"]]
-            end
-            related_url["URL"].each do | url |
-              xml.URL url
-            end
-            xml.Description related_url["Description"]
-          }
-          end
-          
+            xml.Related_URL {
+              unless related_url["URL_Content_Type"].nil?
+                xml.URL_Content_Type {
+                  xml.Type related_url["URL_Content_Type"]["Type"] unless related_url["URL_Content_Type"]["Type"].nil?
+                  xml.Subtype related_url["URL_Content_Type"]["Subtype"] unless related_url["URL_Content_Type"]["Subtype"].nil?
+                }
+              end
+  
+              if related_url["URL"].is_a? String
+                related_url["URL"] = [related_url["URL"]]
+              end
+              
+              related_url["URL"].each do | url |
+                xml.URL url
+              end
+              
+              xml.Description related_url["Description"]
+            }
+            
+          end          
       
           attributes["Parent_DIF"].each do | parent_dif |
             xml.Parent_DIF parent_dif
@@ -724,20 +716,13 @@ module Gcmd
             }
           end
           
-          xml.Originating_Metadata_Node attributes["Originating_Metadata_Node"]
-          
-          xml.Metadata_Name "CEOS IDN DIF"
-          
-          xml.Metadata_Version VERSION
-          
-          xml.DIF_Creation_Date attributes["DIF_Creation_Date"]
-          
-          xml.Last_DIF_Revision_Date attributes["Last_DIF_Revision_Date"]
-          
-          xml.DIF_Revision_History attributes["DIF_Revision_History"]
-          
-          xml.Future_DIF_Review_Date attributes["Future_DIF_Review_Date"]
-          
+          xml.Originating_Metadata_Node attributes["Originating_Metadata_Node"]          
+          xml.Metadata_Name "CEOS IDN DIF"          
+          xml.Metadata_Version VERSION          
+          xml.DIF_Creation_Date attributes["DIF_Creation_Date"]          
+          xml.Last_DIF_Revision_Date attributes["Last_DIF_Revision_Date"]          
+          xml.DIF_Revision_History attributes["DIF_Revision_History"]          
+          xml.Future_DIF_Review_Date attributes["Future_DIF_Review_Date"]          
           xml.Private attributes["Private"]
         }
       end
@@ -746,48 +731,48 @@ module Gcmd
     end
 
     def build_personnel(personnel, xml)
-           personnel.each do |p|
-            xml.Personnel {
-              if p["Role"].nil?
-                p["Role"] = [] 
-              elsif p["Role"].is_a? String
-                role = p["Role"]
-                p["Role"] = [role]
-              end
-
-              if p["Email"].nil?
-                p["Email"] = [] 
-              elsif p["Email"].is_a? String
-                email = p["Email"]
-                p["Email"] = [email]
-              end
-
-              p["Role"].each do | role |
-                xml.Role role
-              end
-              xml.First_Name p["First_Name"]
-              xml.Middle_Name p["Middle_Name"]
-              xml.Last_Name p["Last_Name"]
-
-              p["Email"].each do | email|
-                xml.Email email
-              end
-              
-            }
-            end
+      personnel.each do |p|
+        xml.Personnel {
+          if p["Role"].nil?
+            p["Role"] = [] 
+          elsif p["Role"].is_a? String
+            role = p["Role"]
+            p["Role"] = [role]
+          end
+   
+          if p["Email"].nil?
+            p["Email"] = [] 
+          elsif p["Email"].is_a? String
+            email = p["Email"]
+            p["Email"] = [email]
+          end
+   
+          p["Role"].each do | role |
+            xml.Role role
+          end
+          
+          xml.First_Name p["First_Name"]
+          xml.Middle_Name p["Middle_Name"]
+          xml.Last_Name p["Last_Name"]
+   
+          p["Email"].each do | email|
+            xml.Email email
+          end          
+        }
+      end
     end
-    #
+    
     # Converts simple XML documents into JSON by calling itself recursively
-    # @see #document_to_object for usage
+    # @see #document_to_object
     
     def hash_from_nokogiri_xml_element ( elmt )
       json_document = {}
       elmt.each do | node |
-  
+        
         unless exclude? node.name
-        
+          
           dif_multiples( json_document, node)
-        
+          
           if node.children.children.any?
             if json_document.has_key?( node.name )
               json_document[ node.name ] = handle_multiple_occurrences( json_document, node )
@@ -814,10 +799,7 @@ module Gcmd
       json_document
     end
     
-  
-    #
-    # For the unbounded DIF elements define an array to hold all the values even if there is only one occurrence
-    #
+    # For the unbounded DIF elements define an array to hold all the values even if there is only one occurrence    
     # the elegant way would be to look up multiplicity in the xml schema...
     # OR: explicit define multiplicity = 1 (fewer)
     def dif_multiples( json_document, node)
@@ -830,12 +812,9 @@ module Gcmd
       end
     end
     
-  
-    #
     # In case of multiple element occurrences create an array for the values
     # and save them with one JSON key (This prevents overwriting of re-occurring elements)
-    #
-  
+    
     def handle_multiple_occurrences( json_document, node )
       occurrences = []
       if json_document[ node.name ].is_a?( Array )
@@ -866,14 +845,18 @@ module Gcmd
     
     def schema_element_occurs(max_or_min="max", occurs="unbounded")
       list = []
+      
       unless ["max", "min"].include? max_or_min
         raise "Argument error"
       end
+      
       ng = Nokogiri::XML::Document.parse(xsd)     
       res = ng.xpath("//xs:element[@#{max_or_min}Occurs='#{occurs}']/@ref", { "xs" => "http://www.w3.org/2001/XMLSchema"})
+      
       res.each do | ref |
         list << ref.chomp
       end
+      
       list.sort
     end  
   end
