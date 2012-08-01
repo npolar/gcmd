@@ -36,15 +36,29 @@ module Gcmd
     # for further operations since Xpath operations and XML operations are generally more
     # expensive then hashs operations.
     
-    def collect_info
-
+    def schema_info
+      info = generate_info( root )
     end
     
     # This is a recursive method that walks the XML structure. It makes sure that data
-    # is collected from all lvls of the schema. It returns a Hash object
+    # is collected from all levels of the schema. It returns a Hash object.
     
-    def generate_info
-
+    def generate_info( node )
+      info = {}
+      
+      schema.xpath("//xs:element[@name='#{node}']/xs:complexType/xs:sequence/xs:element").each do | child |
+        name = child.xpath("./@ref").to_s        
+        children = generate_info( name ) if has_children?( name )
+        
+        info[name] = {
+          "required" => required?( child ),
+          "unbounded" => unbounded?( child )
+        }
+        
+        info[name]["children"] = children unless children.nil?
+      end
+      
+      info
     end
     
     # Generate Template from XML xml_schema
@@ -57,7 +71,7 @@ module Gcmd
     
     protected
     
-    def children?( name )
+    def has_children?( name )
       return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType").any?
       false
     end
@@ -68,12 +82,12 @@ module Gcmd
     end
     
     def unbounded?( element )
-      return true if element.xpath("//@maxOccurs").to_s == "unbounded"
+      return true if element.xpath("./@maxOccurs").to_s == "unbounded"
       false
     end
     
     def required?( element )
-      return true if element.xpath("//@minOccurs").to_s == "1"
+      return true if element.xpath("./@minOccurs").to_s == "1"
       false
     end
     
