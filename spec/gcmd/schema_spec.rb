@@ -1,7 +1,5 @@
 require "spec_helper"
-
 require "gcmd/schema"
-require "gcmd/tools"
 
 require "nokogiri"
 
@@ -31,22 +29,32 @@ describe Gcmd::Schema do
     
     context "Information extraction" do
       
-      context "#collect_info" do
+      context "#schema_info" do
         
-        it "should return a Hash object" 
+        it "should return a Hash object" do
+          subject.schema_info.should be_a_kind_of( Hash )
+        end
         
-        it "should contain the elements defined in the schema" 
+        it "should contain the elements from the scheme" do
+          subject.schema_info.should include("Entry_ID", "Personnel")
+        end
+        
+        # @todo find a better matcher for partial hashes and test inner hash content like children
+        
+        it "should contain descriptive information" do
+          subject.schema_info.should include("Entry_ID" => {"required" => true ,"unbounded" => false})
+        end
         
       end
       
-      context "#children?" do
+      context "#has_children?" do
         
         it "should return true if the element has children" do
-          subject.send( :children?, "DIF" ).should == true
+          subject.send( :has_children?, "DIF" ).should == true
         end
         
         it "should return false if the element doesn't have any children" do
-          subject.send( :children?, "Entry_ID" ).should == false
+          subject.send( :has_children?, "Entry_ID" ).should == false
         end
         
       end
@@ -72,13 +80,13 @@ describe Gcmd::Schema do
       context "#unbounded?" do
         
         it "should return true when the elements maxOccurs == unbounded" do
-          data = subject.load_xml( '<xs:element ref="ele" minOccurs="1" maxOccurs="unbounded"/>' )
-          subject.send( :unbounded?, data).should == true
+          data = Nokogiri::XML.parse( '<xs:element ref="ele" minOccurs="1" maxOccurs="unbounded"/>' ).children.first
+          subject.send( :unbounded?, data ).should == true
         end
         
         it "should return false when the elements maxOccurs != unbounded" do
-          data = subject.load_xml( '<xs:element ref="ele" minOccurs="1" maxOccurs="1"/>' )
-          subject.send( :unbounded?, data).should == false
+          data = Nokogiri::XML.parse( '<xs:element ref="ele" minOccurs="1" maxOccurs="1"/>' ).children.first
+          subject.send( :unbounded?, data ).should == false
         end
         
       end
@@ -86,13 +94,13 @@ describe Gcmd::Schema do
       context "#required?" do
         
         it "should return true when the elements minOccurs == 1" do
-          data = subject.load_xml( '<xs:element ref="ele" minOccurs="1" maxOccurs="unbounded"/>' )
-          subject.send( :required?, data).should == true
+          data = Nokogiri::XML.parse( '<xs:element ref="ele" minOccurs="1" maxOccurs="unbounded"/>' ).children.first
+          subject.send( :required?, data ).should == true
         end
         
         it "should return false when the elements minOccurs == 0" do
-          data = subject.load_xml( '<xs:element ref="ele" minOccurs="0" maxOccurs="unbounded"/>' )
-          subject.send( :required?, data).should == false
+          data = Nokogiri::XML.parse( '<xs:element ref="ele" minOccurs="0" maxOccurs="unbounded"/>' ).children.first
+          subject.send( :required?, data ).should == false
         end        
         
       end
