@@ -48,7 +48,7 @@ describe Gcmd::Tools do
         
         it "should accept data from a uri" do
           # json service reply from geonames.org
-          uri = "http://api.geonames.org/postalCodeLookupJSON?postalcode=6600&country=AT&username=demo".to_s
+          uri = "http://api.geonames.org/postalCodeLookupJSON?postalcode=6600&country=AT&username=demo"
           subject.load_json( uri ).should be_a_kind_of( Hash )
         end
         
