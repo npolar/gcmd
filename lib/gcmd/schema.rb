@@ -10,7 +10,9 @@ module Gcmd
   #
   # [Functionality]
   #   * Hash template generation from XML schema files
-  #   * Information collection
+  #   * Information collection:
+  #     - Gather occurence information
+  #     - Gather required fields
   #
   # @see http://nokogiri.org/ Nokogiri XML/HTML parsing library
   #
