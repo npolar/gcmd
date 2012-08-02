@@ -18,6 +18,9 @@ module Gcmd
   #
   # @author Ruben Dens
   # @author Conrad Helgeland
+  #
+  # [License]
+  #   This code is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
 
   class Schema < Gcmd::Tools
     
@@ -37,8 +40,8 @@ module Gcmd
     # basically a translation from XML schema to a Hash schema.
     # @see #generate_info
     
-    def schema_info
-      info = generate_info( root )
+    def info
+      generate_info( root )
     end
     
     # This is a recursive method that walks the XML structure.
@@ -63,11 +66,10 @@ module Gcmd
       info
     end
     
-    # Generate a template Hash from the #schema_info
+    # Generate a template Hash from the #info
     
     def hash_template
-      template = {}      
-      info = schema_info
+      template = {}
       
       info.each do | key, value |
         template[key] = generate_structure( value )
@@ -99,7 +101,6 @@ module Gcmd
     
     def unbounded      
       elements = []      
-      info = schema_info
 
       info.each do | key, value |
         elements << key if value["unbounded"]
