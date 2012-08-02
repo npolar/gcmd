@@ -2,7 +2,6 @@ require "spec_helper"
 require "gcmd/tools"
 
 require "nokogiri"
-#require "json"
 
 describe Gcmd::Tools do
   
