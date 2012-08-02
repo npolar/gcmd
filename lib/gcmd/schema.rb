@@ -49,21 +49,21 @@ module Gcmd
     # the schema.
     
     def generate_info( node )
-      info = {}
+      information = {}
       
       schema.xpath("//xs:element[@name='#{node}']/xs:complexType/xs:sequence/xs:element").each do | child |
         name = child.xpath("./@ref").to_s        
         children = generate_info( name ) if has_children?( name )
         
-        info[name] = {
+        information[name] = {
           "required" => required?( child ),
           "unbounded" => unbounded?( child )
         }
         
-        info[name]["children"] = children unless children.nil?
+        information[name]["children"] = children unless children.nil?
       end
       
-      info
+      information
     end
     
     # Generate a template Hash from the #info
