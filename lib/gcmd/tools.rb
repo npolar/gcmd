@@ -1,4 +1,5 @@
 require "nokogiri"
+require "json"
 require "open-uri"
 
 module Gcmd
@@ -36,6 +37,24 @@ module Gcmd
         
       rescue        
         raise ArgumentError, "Invalid Source"        
+      end      
+    end
+    
+    # Load DIF JSON from source (File_path|string|URI)
+    # This returns a Ruby Hash object
+
+    def load_json( source, uri = false )
+      begin
+        
+        if uri or source =~ /^http(s)?\:\/\//
+          JSON.parse( open( source ) )
+        else
+          source = File.read( source ) if File.exists? source          
+          JSON.parse( source )
+        end
+        
+      rescue
+        raise ArgumentError, "Invalid Source"
       end      
     end
     
