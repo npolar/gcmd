@@ -61,20 +61,20 @@ describe Gcmd::Schema do
     
     context "Information extraction" do
       
-      context "#schema_info" do
+      context "#info" do
         
         it "should return a Hash object" do
-          subject.schema_info.should be_a_kind_of( Hash )
+          subject.info.should be_a_kind_of( Hash )
         end
         
         it "should contain the elements from the scheme" do
-          subject.schema_info.should include("Entry_ID", "Personnel")
+          subject.info.should include("Entry_ID", "Personnel")
         end
         
         # @todo find a better matcher for partial hashes and test inner hash content like children
         
         it "should contain descriptive information" do
-          subject.schema_info.should include("Entry_ID" => {"required" => true ,"unbounded" => false})
+          subject.info.should include("Entry_ID" => {"required" => true ,"unbounded" => false})
         end
         
       end
