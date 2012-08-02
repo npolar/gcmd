@@ -1,3 +1,6 @@
+require "gcmd/tools"
+require "gcmd/schema"
+
 require "rubygems"
 require "yajl/json_gem"
 require "nokogiri"
@@ -12,11 +15,11 @@ module Gcmd
   # @see http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd DIF XML Schema
   # @see http://gcmd.nasa.gov/Aboutus/ About GCDM
   #
-  # Gcmd::Dif contains methods for
-  # - loading DIF XML
-  # - converting DIF XML to a Ruby Hash object
-  # - exporting attributes Hash to DIF XML
-  # - validating DIF XML
+  # [Functionality provided by this class]
+  #   - loading DIF XML
+  #   - converting DIF XML to a Ruby Hash object
+  #   - exporting attributes Hash to DIF XML
+  #   - validating DIF XML
   #
   # @todo transforming DIF XML using XSLT
   #
@@ -26,8 +29,9 @@ module Gcmd
   # @author Conrad Helgeland
   #
   # [Project License]
-  # This project is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
-  class Dif
+  #   This project is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
+  
+  class Dif < Gcmd::Tools
     
     # 17 highly recommended DIF fields
     HIGHLY_RECOMMENDED = ["Access_Constraints", "Data_Resolution", "Data_Set_Citation", "Data_Set_Language",
@@ -187,46 +191,11 @@ module Gcmd
       multiplicity(name)[1]
     end
     
-    def load(hash, uri = false)
-      if uri or hash =~ /^http(s)?\:\/\//
-        hash = JSON.parse(open(hash))
-      elsif hash.is_a? String
-        hash = JSON.parse(hash)
-      end
+    # Load DIF hash
+    # Returns a Ruby Hash Object
+    
+    def load( hash, uri = false )      
       json_skeleton.merge(hash)
-    end
-
-    # Load DIF XML from source (filename/string, or URI)
-
-    def load_xml( source, uri = false )
-      unless source.nil?
-        if uri or source =~ /^http(s)?\:\/\//
-          self.document = Nokogiri::XML::Document.parse( open( source ).read, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
-        else
-          if File.exists? source
-            source = File.open( source )
-          end
-          
-          self.document = Nokogiri::XML::Document.parse( source, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
-          
-        end
-        
-        o = document_to_object
-        
-        # Merge each DIF with the skeleton to get a complete tag representation
-        
-        #o.each_with_index do |item, index|
-        #  o[index] = json_skeleton.merge(item)
-        #end
-        
-        self.attributes = o
-      end
-    end
-
-    # Load DIF JSON from source (filename/string, or URI)
-
-    def load_json( source, uri = false )
-      raise "Not implemented"
     end
     
     def schema
@@ -262,12 +231,13 @@ module Gcmd
       end
     end
     
-    # Detect DIF tags in the XML
+    # Detect DIF documents in the XML and call the parser on each document
+    # This returns an Array of Ruby Hash objects
   
     def document_to_object
       obj = []
         
-      document.xpath(dif_xpath, NAMESPACE) .each do | node |
+      document.xpath(dif_xpath, NAMESPACE).each do | node |
         # node -> Nokogiri::XML::Element
         json_data = hash_from_nokogiri_xml_element( node.children )
         obj << json_data
@@ -280,7 +250,7 @@ module Gcmd
       attributes.to_json
     end
     
-    def to_xml
+    def to_xml      
       build_xml.to_xml
       
       #if attributes.is_a? Hash
@@ -422,14 +392,14 @@ module Gcmd
     #   </xs:complexType>
     # </xs:element>
     def build_xml
-       
+     
       builder = Nokogiri::XML::Builder.new(:encoding => "utf-8") do | xml |
 
         xml.DIF(:xmlns => NAMESPACE["dif"],
           :"xsi:schemaLocation" => "#{NAMESPACE["dif"]} #{NAMESPACE["dif"]}dif_v#{VERSION}.xsd",
           :"xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {
-        
-          xml.Entry_ID    attributes["Entry_ID"]
+         
+          xml.Entry_ID attributes["Entry_ID"]
           
           xml.Entry_Title attributes["Entry_Title"]
           
