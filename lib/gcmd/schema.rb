@@ -31,17 +31,17 @@ module Gcmd
       @schema = load_xml( xml_schema )
     end
     
-    # Generate an information Hash from the XML schema. This is basically a translation from
-    # XML schema to a Hash schema. It's recommended to use the resulting output from this
-    # for further operations since Xpath operations and XML operations are generally more
-    # expensive then hashs operations.
+    # Generate an information Hash from the XML schema. This is
+    # basically a translation from XML schema to a Hash schema.
+    # @see #generate_info
     
     def schema_info
       info = generate_info( root )
     end
     
-    # This is a recursive method that walks the XML structure. It makes sure that data
-    # is collected from all levels of the schema. It returns a Hash object.
+    # This is a recursive method that walks the XML structure.
+    # It makes sure that data is collected from all levels of
+    # the schema.
     
     def generate_info( node )
       info = {}
@@ -61,12 +61,65 @@ module Gcmd
       info
     end
     
-    # Generate Template from XML xml_schema
-    # This returns a Ruby Hash object of the
-    # document described in the xml_schema
+    # Generate a template Hash from the #schema_info
     
     def hash_template
+      template = {}      
+      info = schema_info
+      
+      info.each do | key, value |
+        template[key] = generate_structure( value )
+      end
+      
+      template
+    end
+    
+    # Recursive function that checks the information
+    # Hash for every element and generates the proper
+    # value structure.
+    
+    def generate_structure( value )
+      part = {}
+      unless value.has_key?( "children" )
+        return [] if value["unbounded"]
+        return ""
+      else
+        value["children"].each do | key, value |
+          part[key] = generate_structure(value)
+        end       
+      end
+      
+      return [part] if value["unbounded"]
+      part 
+    end
+    
+    # Returns an array with unbounded elements
+    
+    def unbounded      
+      elements = []      
+      info = schema_info
 
+      info.each do | key, value |
+        elements << key if value["unbounded"]
+        elements << lookup_unbounded( value )        
+      end
+      
+      elements.flatten
+    end
+    
+    # Recursively look up unbounded child elements
+    
+    def lookup_unbounded( value )
+      elements = []
+      if value.has_key?( "children" )
+        value["children"].each do |key, value|
+          elements << key if value["unbounded"]
+          if value.has_key?( "children" )
+            elements << lookup_unbounded( value )
+          end
+        end
+      end
+      elements
     end
     
     protected
