@@ -15,13 +15,45 @@ describe Gcmd::Schema do
       
       context "#hash_template" do
         
-        it "should generate a template hash from an XML schema" 
+        it "should return a Hash object" do
+          subject.hash_template.should be_a_kind_of( Hash )
+        end
         
-        it "should contain elements defined in the schema" 
+        it "should contain elements defined in the schema" do
+          subject.hash_template.should include("Entry_ID", "Temporal_Coverage")
+        end
         
-        it "should represent unbounded items as arrays" 
+        it "should represent unbounded items as arrays" do
+          subject.hash_template["Personnel"].should be_a_kind_of( Array )
+        end
         
-        it "should represent items that can only occur once as strings"
+        it "should represent items that can only occur once as strings" do
+          subject.hash_template["Entry_ID"].should == ""
+        end
+        
+      end
+      
+      context "#generate_structure" do
+        
+        it "should return a string if bounded" do
+          data = {"unbounded" => false}
+          subject.generate_structure( data ).should == ""
+        end
+        
+        it "should return an array if unbounded" do
+          data = { "unbounded" => true }
+          subject.generate_structure( data ).should be_a_kind_of( Array )
+        end
+        
+        it "should return a Hash if bounded and it has children" do
+          data = { "unbounded" => false, "children" => {} }
+          subject.generate_structure( data ).should be_a_kind_of( Hash )
+        end
+        
+        it "should return an Array if unbounded and it has children" do
+          data = { "unbounded" => true, "children" => {} }
+          subject.generate_structure( data ).should be_a_kind_of( Array )
+        end
         
       end
       
@@ -44,6 +76,18 @@ describe Gcmd::Schema do
         it "should contain descriptive information" do
           subject.schema_info.should include("Entry_ID" => {"required" => true ,"unbounded" => false})
         end
+        
+      end
+      
+      context "#unbounded" do
+        
+        it "should return an array" do
+          subject.unbounded.should be_a_kind_of( Array )
+        end
+        
+        it "should contain unbounded elements" do
+          subject.unbounded.should include( "IDN_Node", "Chronostratigraphic_Unit", "Personnel", "Email" )
+        end        
         
       end
       
