@@ -14,13 +14,13 @@ module Gcmd
   #     - Gather occurence information
   #     - Gather required fields
   #
+  # [License]
+  #   This code is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
+  #
   # @see http://nokogiri.org/ Nokogiri XML/HTML parsing library
   #
   # @author Ruben Dens
   # @author Conrad Helgeland
-  #
-  # [License]
-  #   This code is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
 
   class Schema < Gcmd::Tools
     
@@ -68,7 +68,7 @@ module Gcmd
     
     # Generate a template Hash from the #info
     
-    def hash_template
+    def template_hash
       template = {}
       
       info.each do | key, value |
