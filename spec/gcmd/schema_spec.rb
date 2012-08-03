@@ -13,22 +13,22 @@ describe Gcmd::Schema do
     
     context "Template generation" do
       
-      context "#hash_template" do
+      context "#template_hash" do
         
         it "should return a Hash object" do
-          subject.hash_template.should be_a_kind_of( Hash )
+          subject.template_hash.should be_a_kind_of( Hash )
         end
         
         it "should contain elements defined in the schema" do
-          subject.hash_template.should include("Entry_ID", "Temporal_Coverage")
+          subject.template_hash.should include("Entry_ID", "Temporal_Coverage")
         end
         
         it "should represent unbounded items as arrays" do
-          subject.hash_template["Personnel"].should be_a_kind_of( Array )
+          subject.template_hash["Personnel"].should be_a_kind_of( Array )
         end
         
         it "should represent items that can only occur once as strings" do
-          subject.hash_template["Entry_ID"].should == ""
+          subject.template_hash["Entry_ID"].should == ""
         end
         
       end
