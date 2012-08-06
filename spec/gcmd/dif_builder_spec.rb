@@ -149,27 +149,22 @@ describe Gcmd::DifBuilder do
     context "#sort_array" do
       
       it "should return an array" do
-        template = {"animals" => []}
-        subject.sort_array( [], template ).should be_a_kind_of( Array )
+        subject.sort_array( [], {"animals" => []} ).should be_a_kind_of( Array )
       end
       
       it "should return the template values if called with an empty array" do
-        template = {"animals" => []}
-        subject.sort_array( [], template ).should == [{"animals" => []}]
+        subject.sort_array( [], {"animals" => []} ).should == [{"animals" => []}]
       end
       
       it "should return an array of hashes if provided with an array of hashes" do
-        template = {"animals" => []}
         data = [{"animals" => ["dog", "cow"]},{"animals" => ["pig"]}]
-        subject.sort_array( data, template ).first.should be_a_kind_of( Hash )
-        subject.sort_array( data, template ).first.should == {"animals" => ["dog", "cow"]}
+        subject.sort_array( data, {"animals" => []} ).first.should be_a_kind_of( Hash )
+        subject.sort_array( data, {"animals" => []} ).first.should == {"animals" => ["dog", "cow"]}
       end
       
       it "should return an array of strings when provided with a string array" do
-        template = ""
-        data = ["dog", "pig"]
-        subject.sort_array( data, template ).first.should be_a_kind_of( String )
-        subject.sort_array( data, template ).first.should == "dog"
+        subject.sort_array( ["dog", "pig"], "" ).first.should be_a_kind_of( String )
+        subject.sort_array( ["pig", "cow"], "" ).first.should == "pig"
       end
       
     end
