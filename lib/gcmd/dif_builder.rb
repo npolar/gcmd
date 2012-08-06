@@ -26,6 +26,7 @@ module Gcmd
     
     def initialize( xml_schema = XSD )
       self.schema = Gcmd::Schema.new( xml_schema )
+      self.hash_template = schema.hash_template
     end
     
     def schema
@@ -36,14 +37,22 @@ module Gcmd
       @schema = xml_schema
     end
     
-    # This method builds an XML file from Hash data using
+    def hash_template
+      @hash_template
+    end
+    
+    def hash_template= template
+      @hash_template = template
+    end
+    
+    # This method builds an XML String from Hash data using
     # the Nokogiri::XML::Builder class.
     # @see #build_from_hash
       
     def build_xml( dif_hash = nil )      
-      unless dif_hash.nil?  
+      unless dif_hash.nil?
         
-        builder = Nokogiri::XML::Builder.new(:encoding => "utf-8") do | xml |
+        builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do | xml |
           
           xml.DIF(:xmlns => NAMESPACE,
             "xsi:schemaLocation" => "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd",
@@ -58,7 +67,67 @@ module Gcmd
       end
       
       builder.to_xml      
-    end    
+    end
+    
+    # @note This feature requires Ruby 1.9 or above since it
+    #   requires ordered hashes.
+    #
+    # Sorts a provided hash based on the assosiated template and merges
+    # it with the provided template. This function is recursive.
+    #
+    # @see #sort_array
+    
+    def sort_hash( hash, template = nil )
+      completed = {}
+     
+      unless template.nil?
+        
+        template.each do | key, value |
+          unless hash[key].nil?          
+            if hash[key].is_a? String
+              completed[key] = hash[key]
+            elsif hash[key].is_a? Hash
+              completed[key] = sort_hash( hash[key], value )
+            elsif hash[key].is_a? Array
+              completed[key] = sort_array( hash[key], value.first )
+            end          
+          else
+            completed[key] = value          
+          end
+        end
+        
+      else        
+        completed = hash        
+      end
+      
+      completed
+    end
+    
+    # @note This feature requires Ruby 1.9 or above since it
+    #   requires ordered hashes.
+    #    
+    # Sorts an array based on the provided template.
+    #
+    # @see #sort_hash
+    
+    def sort_array( array, template=nil )
+      
+      data = []
+      
+      if array.any?        
+        array.each do | item |
+          if item.is_a? String
+            data << item
+          elsif item.is_a? Hash
+            data << sort_hash( item, template )
+          end
+        end
+      else
+        data << template        
+      end
+      
+      data
+    end
     
     # A recursive function that loops the Hash and detects nested
     # Hashes and Arrays. On a nested Hash a recursive call happens
@@ -108,11 +177,7 @@ module Gcmd
     # @see Gcdm::Schema
     
     def xml_template
-      unless schema.nil?
-        build_xml( schema.template_hash )
-      else
-        raise ArgumentError, "No XML schema found!"
-      end
+      build_xml( hash_template )
     end
     
   end  
