@@ -20,6 +20,11 @@ module Gcmd
     # Default DIF schema (DIF version 9.8.3)
     XSD = "lib/gcmd/dif.xsd"
     
+    # Element Definition
+    
+    REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category",
+                "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
+    
     NAMESPACE = "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
     
     VERSION = "9.8.3"
@@ -45,12 +50,27 @@ module Gcmd
       @hash_template = template
     end
     
+    # This is a conveniance method used to call sync_dif_hash on
+    # the data before creating the xml structure
+    # @see #build_xml
+    
+    def build_dif( dif_hash = nil )
+      unless dif_hash.nil?        
+        dif_hash = sync_dif_hash( dif_hash, hash_template )        
+        build_xml( dif_hash )
+      else
+        raise ArgumentError, "No data provided" 
+      end    
+    end
+    
+    # @todo Extract root node declaration and make completely generic
+    #
     # This method builds an XML String from Hash data using
     # the Nokogiri::XML::Builder class.
     # @see #build_from_hash
       
-    def build_xml( dif_hash = nil )      
-      unless dif_hash.nil?
+    def build_xml( data_hash = nil )      
+      unless data_hash.nil?
         
         builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do | xml |
           
@@ -58,7 +78,7 @@ module Gcmd
             "xsi:schemaLocation" => "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd",
             "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {          
 
-            build_from_hash( xml, dif_hash )          
+            build_from_hash( xml, data_hash )          
           }
           
         end        
@@ -118,10 +138,9 @@ module Gcmd
     #
     # Sorts a provided hash based on the assosiated template and merges
     # it with the provided template. This function is recursive.
-    #
-    # @see #sort_array
+    # @see #sync_array
     
-    def sort_hash( hash, template = nil )
+    def sync_dif_hash( hash, template = nil )
       completed = {}
      
       unless template.nil?
@@ -131,9 +150,9 @@ module Gcmd
             if hash[key].is_a? String
               completed[key] = hash[key]
             elsif hash[key].is_a? Hash
-              completed[key] = sort_hash( hash[key], value )
+              completed[key] = sync_dif_hash( hash[key], value )
             elsif hash[key].is_a? Array
-              completed[key] = sort_array( hash[key], value.first )
+              completed[key] = sync_array( hash[key], value.first )
             end          
           else
             completed[key] = value          
@@ -151,10 +170,9 @@ module Gcmd
     #   requires ordered hashes.
     #    
     # Sorts an array based on the provided template.
-    #
-    # @see #sort_hash
+    # @see #sync_dif_hash
     
-    def sort_array( array, template=nil )
+    def sync_array( array, template=nil )
       
       data = []
       
@@ -163,7 +181,7 @@ module Gcmd
           if item.is_a? String
             data << item
           elsif item.is_a? Hash
-            data << sort_hash( item, template )
+            data << sync_dif_hash( item, template )
           end
         end
       else

@@ -21,8 +21,40 @@ describe Gcmd::DifBuilder do
     end
     
   end
+  
+  context "DIF" do
     
-  context "Conversion to XML" do
+    context "#build_dif" do
+      
+      it "should return a string" do
+        subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should be_a_kind_of( String )
+      end
+      
+      it "should raise an ArgumentError if no data provided" do
+        expect{ subject.build_dif }.to raise_error( ArgumentError )
+      end
+      
+      it "should convert provided elements to XML" do
+        subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "<Entry_ID>Enter-the-ID</Entry_ID>" )
+      end
+      
+      context "it should contain all required fields" do        
+        
+        Gcmd::DifBuilder::REQUIRED.each do | required_element |
+          
+          it required_element do
+            subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "\<#{ required_element }\>" )
+          end
+          
+        end
+        
+      end
+      
+    end
+    
+  end
+    
+  context "Convert Hash to XML" do
     
     context "#build_xml" do
       
@@ -94,16 +126,28 @@ describe Gcmd::DifBuilder do
     
   end
   
-  context "Hash processing" do
+  context "Convert from XML to Hash" do
     
-    context "#sort_hash" do
+    context "#build_hash" do
       
       it "should return a Hash" do
-        subject.sort_hash( {} ).should be_a_kind_of( Hash )
+      
+      end
+      
+    end    
+    
+  end
+  
+  context "Hash processing" do
+    
+    context "#sync_dif_hash" do
+      
+      it "should return a Hash" do
+        subject.sync_dif_hash( {} ).should be_a_kind_of( Hash )
       end
       
       it "should return the input unaltered of no template is provided" do
-        subject.sort_hash( {"key2" => "val2", "key1" => "val1"} ).should == {"key2" => "val2", "key1" => "val1"}
+        subject.sync_dif_hash( {"key2" => "val2", "key1" => "val1"} ).should == {"key2" => "val2", "key1" => "val1"}
       end
       
       it "should should sort items according to the template" do
@@ -118,7 +162,7 @@ describe Gcmd::DifBuilder do
                   "parents" => {"father" => "John", "mother" =>"Jane" },
                   "children" => {"child1" => "Eric", "child2" => "Hannah"}
                 }]}
-        subject.sort_hash( data, template ).should == {"Families" => [{
+        subject.sync_dif_hash( data, template ).should == {"Families" => [{
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "children" => {"child1" => "Jane", "child2" => "John"}
                 },{
@@ -137,7 +181,7 @@ describe Gcmd::DifBuilder do
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "pets" => ["dog", "hamster"]
                 }]}
-        subject.sort_hash( data, template ).should == {"Families" => [{
+        subject.sync_dif_hash( data, template ).should == {"Families" => [{
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "children" => {"child1" => "", "child2" => ""},
                   "pets" => ["dog", "hamster"]
@@ -146,25 +190,25 @@ describe Gcmd::DifBuilder do
 
     end
     
-    context "#sort_array" do
+    context "#sync_array" do
       
       it "should return an array" do
-        subject.sort_array( [], {"animals" => []} ).should be_a_kind_of( Array )
+        subject.sync_array( [], {"animals" => []} ).should be_a_kind_of( Array )
       end
       
       it "should return the template values if called with an empty array" do
-        subject.sort_array( [], {"animals" => []} ).should == [{"animals" => []}]
+        subject.sync_array( [], {"animals" => []} ).should == [{"animals" => []}]
       end
       
       it "should return an array of hashes if provided with an array of hashes" do
         data = [{"animals" => ["dog", "cow"]},{"animals" => ["pig"]}]
-        subject.sort_array( data, {"animals" => []} ).first.should be_a_kind_of( Hash )
-        subject.sort_array( data, {"animals" => []} ).first.should == {"animals" => ["dog", "cow"]}
+        subject.sync_array( data, {"animals" => []} ).first.should be_a_kind_of( Hash )
+        subject.sync_array( data, {"animals" => []} ).first.should == {"animals" => ["dog", "cow"]}
       end
       
       it "should return an array of strings when provided with a string array" do
-        subject.sort_array( ["dog", "pig"], "" ).first.should be_a_kind_of( String )
-        subject.sort_array( ["pig", "cow"], "" ).first.should == "pig"
+        subject.sync_array( ["dog", "pig"], "" ).first.should be_a_kind_of( String )
+        subject.sync_array( ["pig", "cow"], "" ).first.should == "pig"
       end
       
     end
