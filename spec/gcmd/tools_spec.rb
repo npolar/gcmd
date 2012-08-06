@@ -32,7 +32,7 @@ describe Gcmd::Tools do
         it "should accept string formatted data"do
           subject.load_xml( "<DIF></DIF>" ).should be_a_kind_of( Nokogiri::XML::Document )
         end
-        
+
         it "should raise an ArgumentError if the provided source is wrong" do
           expect{ subject.load_xml( "wrong_data.xml" ) }.to raise_error( ArgumentError )
         end
@@ -46,8 +46,8 @@ describe Gcmd::Tools do
       context "#load_json" do
         
         it "should accept data from a uri" do
-          # json service reply from geonames.org
-          uri = "http://api.geonames.org/postalCodeLookupJSON?postalcode=6600&country=AT&username=demo"
+          # json service reply for NorskPolar
+          uri = "http://search.twitter.com/search.json?q=NorskPolar&include_entities=false"
           subject.load_json( uri ).should be_a_kind_of( Hash )
         end
         
