@@ -69,6 +69,50 @@ module Gcmd
       builder.to_xml      
     end
     
+    # A recursive function that loops the Hash and detects nested
+    # Hashes and Arrays. On a nested Hash a recursive call happens
+    # on an Array build_from_array is called.
+    # @see #build_from_array
+    
+    def build_from_hash( xml, hash )
+      
+      hash.each do | key, value |
+        
+        if value.is_a? String
+          xml.send( key, value )
+        elsif value.is_a? Hash
+          xml.send( key ) { build_from_hash( xml, value ) }
+        elsif value.is_a? Array
+          build_from_array( xml, key, value ) 
+        end
+        
+      end
+      
+      xml      
+    end
+    
+    # If the Hash contains Arrays they are read here. When
+    # the array contains string values it generates XML elements
+    # for each value. If it contains Hashses it calls build_from_hash
+    # @see #build_from_hash
+    
+    def build_from_array( xml, key, array )
+      
+      if array.any?
+        array.each do | item |
+          if item.is_a? Hash
+            xml.send(key) { build_from_hash( xml, item ) }
+          else
+            xml.send(key, item)
+          end
+        end
+      else
+        xml.send(key, "")
+      end
+      
+      xml
+    end
+    
     # @note This feature requires Ruby 1.9 or above since it
     #   requires ordered hashes.
     #
@@ -127,50 +171,6 @@ module Gcmd
       end
       
       data
-    end
-    
-    # A recursive function that loops the Hash and detects nested
-    # Hashes and Arrays. On a nested Hash a recursive call happens
-    # on an Array build_from_array is called.
-    # @see #build_from_array
-    
-    def build_from_hash( xml, hash )
-      
-      hash.each do | key, value |
-        
-        if value.is_a? String
-          xml.send( key, value )
-        elsif value.is_a? Hash
-          xml.send( key ) { build_from_hash( xml, value ) }
-        elsif value.is_a? Array
-          build_from_array( xml, key, value ) 
-        end
-        
-      end
-      
-      xml      
-    end
-    
-    # If the Hash contains Arrays they are read here. When
-    # the array contains string values it generates XML elements
-    # for each value. If it contains Hashses it calls build_from_hash
-    # @see #build_from_hash
-    
-    def build_from_array( xml, key, array )
-      
-      if array.any?
-        array.each do | item |
-          if item.is_a? Hash
-            xml.send(key) { build_from_hash( xml, item ) }
-          else
-            xml.send(key, item)
-          end
-        end
-      else
-        xml.send(key, "")
-      end
-      
-      xml
     end
     
     # Calls build XML with a template Hash build from the schema
