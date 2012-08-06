@@ -66,9 +66,9 @@ module Gcmd
       information
     end
     
-    # Generate a template Hash from the #info
+    # Generate a Hash template from the #info
     
-    def template_hash
+    def hash_template
       template = {}
       
       info.each do | key, value |
