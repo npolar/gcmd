@@ -80,7 +80,7 @@ module Gcmd
         
         if value.is_a? String
           xml.send( key, value )
-        elsif value.is_a? Hash
+        elsif value.is_a? Hash          
           xml.send( key ) { build_from_hash( xml, value ) }
         elsif value.is_a? Array
           build_from_array( xml, key, value ) 
@@ -102,7 +102,7 @@ module Gcmd
         array.each do | item |
           if item.is_a? Hash
             xml.send(key) { build_from_hash( xml, item ) }
-          else
+          elsif item.is_a? String
             xml.send(key, item)
           end
         end
