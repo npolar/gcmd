@@ -128,7 +128,7 @@ module Gcmd
     protected
     
     def has_children?( name )
-      return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType").any?
+      return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType/xs:sequence").any?
       false
     end
     
