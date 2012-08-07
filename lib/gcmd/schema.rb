@@ -24,7 +24,10 @@ module Gcmd
 
   class Schema < Gcmd::Tools
     
-    def initialize( xml_schema )
+    # Default DIF schema (DIF version 9.8.3)
+    XSD = "lib/gcmd/dif.xsd"
+    
+    def initialize( xml_schema = XSD )
       self.schema=xml_schema
     end
     
