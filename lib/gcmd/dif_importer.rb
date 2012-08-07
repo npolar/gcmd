@@ -59,19 +59,39 @@ module Gcmd
       obj = []
         
       document.xpath( xpath, namespace ).each do | node |
-        hash_data = hash_from_xml( node )
+        hash_data = hash_from_xml( node.children )
         obj << hash_data
       end
         
       obj
     end
     
-    def hash_from_xml( node )
+    # Recursive method that walks the XML tree and generates an output Hash
+    # @see #handle_multiples
+    
+    def hash_from_xml( element )
       result = {}
       
-      
+      element.each do |node|
+        unless excluded?( node.name )
+          if unbounded?( node.name )
+            result[ node.name ] = handle_multiples( result[ node.name ], node.children )
+          else
+            
+            if node.children.children.any?
+              result[ node.name ] = hash_from_xml( node.children )
+            else
+              result[ node.name ] = node.content
+            end
+            
+          end
+        end
+      end
       
       result
+    end
+    
+    def handle_multiples( array, element )
     end
     
     protected
@@ -80,7 +100,7 @@ module Gcmd
       EXCLUDED.include?( key )
     end
     
-    def unbound?( key )
+    def unbounded?( key )
       schema.unbounded.include?( key )
     end
     
