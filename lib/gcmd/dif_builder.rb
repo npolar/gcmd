@@ -12,6 +12,10 @@ module Gcmd
   # [License]
   #   This code is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
   #
+  # @see http://gcmd.gsfc.nasa.gov/User/difguide/difman.html DIF Guide
+  # @see http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd DIF XML Schema
+  # @see http://gcmd.nasa.gov/Aboutus/ About GCDM
+  #
   # @author Ruben Dens
   # @author Conrad Helgeland
   
@@ -19,9 +23,7 @@ module Gcmd
     
     # Default DIF schema (DIF version 9.8.3)
     XSD = "lib/gcmd/dif.xsd"
-    
-    # Element Definition
-    
+
     REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category",
                 "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
     
@@ -29,30 +31,17 @@ module Gcmd
     
     VERSION = "9.8.3"
     
+    attr_accessor :schema, :hash_template
+    
     def initialize( xml_schema = XSD )
       self.schema = Gcmd::Schema.new( xml_schema )
       self.hash_template = schema.hash_template
     end
     
-    def schema
-      @schema
-    end
-    
-    def schema= xml_schema
-      @schema = xml_schema
-    end
-    
-    def hash_template
-      @hash_template
-    end
-    
-    def hash_template= template
-      @hash_template = template
-    end
-    
-    # This is a conveniance method used to call sync_dif_hash on
+    # This is a convenience method used to call sync_dif_hash on
     # the data before creating the xml structure
     # @see #build_xml
+    # @see #sync_dif_hash
     
     def build_dif( dif_hash = nil )
       unless dif_hash.nil?        
@@ -94,21 +83,21 @@ module Gcmd
     # on an Array build_from_array is called.
     # @see #build_from_array
     
-    def build_from_hash( xml, hash )
+    def build_from_hash( xml_builder, hash )
       
       hash.each do | key, value |
         
         if value.is_a? String
-          xml.send( key, value )
+          xml_builder.send( key, value )
         elsif value.is_a? Hash          
-          xml.send( key ) { build_from_hash( xml, value ) }
+          xml_builder.send( key ) { build_from_hash( xml_builder, value ) }
         elsif value.is_a? Array
-          build_from_array( xml, key, value ) 
+          build_from_array( xml_builder, key, value ) 
         end
         
       end
       
-      xml      
+      xml_builder      
     end
     
     # If the Hash contains Arrays they are read here. When
@@ -116,21 +105,21 @@ module Gcmd
     # for each value. If it contains Hashses it calls build_from_hash
     # @see #build_from_hash
     
-    def build_from_array( xml, key, array )
+    def build_from_array( xml_builder, key, array )
       
       if array.any?
         array.each do | item |
           if item.is_a? Hash
-            xml.send(key) { build_from_hash( xml, item ) }
+            xml_builder.send(key) { build_from_hash( xml_builder, item ) }
           elsif item.is_a? String
-            xml.send(key, item)
+            xml_builder.send(key, item)
           end
         end
       else
-        xml.send(key, "")
+        xml_builder.send(key, "")
       end
       
-      xml
+      xml_builder
     end
     
     # @note This feature requires Ruby 1.9 or above since it
@@ -167,7 +156,7 @@ module Gcmd
     end
     
     # @note This feature requires Ruby 1.9 or above since it
-    #   requires ordered hashes.
+    #   makes use of ordered hashes.
     #    
     # Sorts an array based on the provided template.
     # @see #sync_dif_hash
