@@ -21,9 +21,6 @@ module Gcmd
   
   class DifBuilder < Gcmd::Tools
     
-    # Default DIF schema (DIF version 9.8.3)
-    XSD = "lib/gcmd/dif.xsd"
-
     REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category",
                 "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
     
@@ -33,8 +30,8 @@ module Gcmd
     
     attr_accessor :schema, :hash_template
     
-    def initialize( xml_schema = XSD )
-      self.schema = Gcmd::Schema.new( xml_schema )
+    def initialize
+      self.schema = Gcmd::Schema.new
       self.hash_template = schema.hash_template
     end
     
