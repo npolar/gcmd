@@ -23,6 +23,7 @@ describe Gcmd::DifImporter do
     context "#build_hash_documents" do
       
       it "should return an array" do
+        subject.stub( :document_to_object ) {[]}
         subject.build_hash_documents.should be_a_kind_of( Array )
       end
       
@@ -56,7 +57,39 @@ describe Gcmd::DifImporter do
     context "#hash_from_xml" do
       
       it "should return a Hash" do
-        subject.hash_from_xml( "" ).should be_a_kind_of( Hash )
+        xml = Nokogiri::XML( "<Root><Element>elData</Element></Root>" ).children
+        subject.hash_from_xml( xml ).should be_a_kind_of( Hash )
+      end
+      
+      it "should include non excluded elements" do
+        xml = Nokogiri::XML( "<Root><a>b</a></Root>" ).children
+        subject.hash_from_xml( xml.children ).should == {"a" => "b" }
+      end
+      
+      it "shouldn't include excluded elements" do
+        xml = Nokogiri::XML( "<Root><Fax>123456</Fax></Root>" ).children
+        subject.hash_from_xml( xml.children ).should_not include( {"Fax" => "123456" } )
+      end
+      
+      it "should return a String for childless elements" do
+        xml = Nokogiri::XML( "<Root><a>b</a></Root>" ).children
+        hash = subject.hash_from_xml( xml.children )
+        hash["a"].should be_a_kind_of( String )
+      end
+      
+      it "should return a Hash for elements with children" do
+        xml = Nokogiri::XML( "<Root><a><b>c</b></a></Root>" ).children
+        hash = subject.hash_from_xml( xml.children )
+        hash["a"].should be_a_kind_of( Hash )
+        hash["a"].should == {"b" => "c"}
+      end
+      
+      it "should return an Array for unbounded elements" do
+        subject.stub( :handle_multiples ) { ["a"] }
+        
+        xml = Nokogiri::XML( "<DIF><ISO_Topic_Category>a</ISO_Topic_Category></DIF>" ).children
+        hash = subject.hash_from_xml( xml.children )
+        hash["ISO_Topic_Category"].should be_a_kind_of( Array )
       end
         
     end
@@ -73,10 +106,10 @@ describe Gcmd::DifImporter do
       
     end
     
-    context "#unbound?" do
+    context "#unbounded?" do
       
       it "should return true if element is defined as unbounded in schema" do
-        subject.send( :unbound?, "Role" ).should be( true )
+        subject.send( :unbounded?, "Role" ).should be( true )
       end
       
     end
