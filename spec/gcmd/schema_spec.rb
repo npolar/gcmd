@@ -11,6 +11,11 @@ describe Gcmd::Schema do
   
   context "Schema Tools" do
     
+    it "should have a default schema" do
+      my_schema = Gcmd::Schema.new
+      my_schema.schema.should_not be( nil )
+    end
+    
     context "Template generation" do
       
       context "#hash_template" do
