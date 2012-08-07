@@ -63,4 +63,24 @@ describe Gcmd::DifImporter do
     
   end
   
+  context "Import Options" do
+    
+    context "#excluded?" do
+      
+      it "should return true if element is declared in Gcmd::DifImporter::EXCLUDED" do
+        subject.send( :excluded?, "Fax" ).should be( true )
+      end
+      
+    end
+    
+    context "#unbound?" do
+      
+      it "should return true if element is defined as unbounded in schema" do
+        subject.send( :unbound?, "Role" ).should be( true )
+      end
+      
+    end
+    
+  end
+  
 end
