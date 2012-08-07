@@ -28,9 +28,10 @@ module Gcmd
 
     REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category", "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
     
-    attr_accessor :document
+    attr_accessor :document, :schema
     
     def initialize( dif_xml=nil )
+      self.schema = Gcmd::Schema.new
       self.document = load_xml( dif_xml ) unless dif_xml.nil?
     end
    
@@ -66,7 +67,21 @@ module Gcmd
     end
     
     def hash_from_xml( node )
-      {}
+      result = {}
+      
+      
+      
+      result
+    end
+    
+    protected
+    
+    def excluded?( key )
+      EXCLUDED.include?( key )
+    end
+    
+    def unbound?( key )
+      schema.unbounded.include?( key )
     end
     
   end
