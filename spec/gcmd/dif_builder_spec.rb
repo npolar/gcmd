@@ -6,17 +6,12 @@ require "nokogiri"
 describe Gcmd::DifBuilder do
   
   subject do
-    Gcmd::DifBuilder.new("spec/data/dif.xsd")
+    Gcmd::DifBuilder.new
   end
   
   context "Schema" do
     
-    it "should load the default schema if not provided with one" do
-      builder = Gcmd::DifBuilder.new
-      builder.schema.should_not be( nil )
-    end
-    
-    it "should load the schema it's initialized with" do
+    it "should have a default schema" do
       subject.schema.should_not be(nil)
     end
     
