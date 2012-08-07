@@ -27,8 +27,11 @@ module Gcmd
     # Default DIF schema (DIF version 9.8.3)
     XSD = "lib/gcmd/dif.xsd"
     
+    attr_accessor :info
+    
     def initialize( xml_schema = XSD )
       self.schema=xml_schema
+      self.info = generate_info( root )
     end
     
     def schema
@@ -37,14 +40,6 @@ module Gcmd
     
     def schema=xml_schema
       @schema = load_xml( xml_schema )
-    end
-    
-    # Generate an information Hash from the XML schema. This is
-    # basically a translation from XML schema to a Hash schema.
-    # @see #generate_info
-    
-    def info
-      generate_info( root )
     end
     
     # This is a recursive method that walks the XML structure.
