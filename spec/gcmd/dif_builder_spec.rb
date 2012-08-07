@@ -126,28 +126,16 @@ describe Gcmd::DifBuilder do
     
   end
   
-  context "Convert from XML to Hash" do
-    
-    context "#build_hash" do
-      
-      it "should return a Hash" do
-      
-      end
-      
-    end    
-    
-  end
-  
   context "Hash processing" do
     
-    context "#sync_dif_hash" do
+    context "#sync_with_template" do
       
       it "should return a Hash" do
-        subject.sync_dif_hash( {} ).should be_a_kind_of( Hash )
+        subject.sync_with_template( {} ).should be_a_kind_of( Hash )
       end
       
       it "should return the input unaltered of no template is provided" do
-        subject.sync_dif_hash( {"key2" => "val2", "key1" => "val1"} ).should == {"key2" => "val2", "key1" => "val1"}
+        subject.sync_with_template( {"key2" => "val2", "key1" => "val1"} ).should == {"key2" => "val2", "key1" => "val1"}
       end
       
       it "should should sort items according to the template" do
@@ -162,7 +150,7 @@ describe Gcmd::DifBuilder do
                   "parents" => {"father" => "John", "mother" =>"Jane" },
                   "children" => {"child1" => "Eric", "child2" => "Hannah"}
                 }]}
-        subject.sync_dif_hash( data, template ).should == {"Families" => [{
+        subject.sync_with_template( data, template ).should == {"Families" => [{
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "children" => {"child1" => "Jane", "child2" => "John"}
                 },{
@@ -181,7 +169,7 @@ describe Gcmd::DifBuilder do
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "pets" => ["dog", "hamster"]
                 }]}
-        subject.sync_dif_hash( data, template ).should == {"Families" => [{
+        subject.sync_with_template( data, template ).should == {"Families" => [{
                   "parents" => {"mother" =>"Hannah", "father" => "Eric"},
                   "children" => {"child1" => "", "child2" => ""},
                   "pets" => ["dog", "hamster"]

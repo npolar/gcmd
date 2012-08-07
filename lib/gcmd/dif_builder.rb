@@ -38,14 +38,14 @@ module Gcmd
       self.hash_template = schema.hash_template
     end
     
-    # This is a convenience method used to call sync_dif_hash on
+    # This is a convenience method used to call sync_with_template on
     # the data before creating the xml structure
     # @see #build_xml
-    # @see #sync_dif_hash
+    # @see #sync_with_template
     
     def build_dif( dif_hash = nil )
-      unless dif_hash.nil?        
-        dif_hash = sync_dif_hash( dif_hash, hash_template )        
+      unless dif_hash.nil?
+        dif_hash = sync_with_template( dif_hash, hash_template )        
         build_xml( dif_hash )
       else
         raise ArgumentError, "No data provided" 
@@ -89,15 +89,15 @@ module Gcmd
         
         if value.is_a? String
           xml_builder.send( key, value )
-        elsif value.is_a? Hash          
+        elsif value.is_a? Hash
           xml_builder.send( key ) { build_from_hash( xml_builder, value ) }
         elsif value.is_a? Array
-          build_from_array( xml_builder, key, value ) 
+          build_from_array( xml_builder, key, value )
         end
         
       end
       
-      xml_builder      
+      xml_builder
     end
     
     # If the Hash contains Arrays they are read here. When
@@ -129,7 +129,7 @@ module Gcmd
     # it with the provided template. This function is recursive.
     # @see #sync_array
     
-    def sync_dif_hash( hash, template = nil )
+    def sync_with_template( hash, template = nil )
       completed = {}
      
       unless template.nil?
@@ -139,7 +139,7 @@ module Gcmd
             if hash[key].is_a? String
               completed[key] = hash[key]
             elsif hash[key].is_a? Hash
-              completed[key] = sync_dif_hash( hash[key], value )
+              completed[key] = sync_with_template( hash[key], value )
             elsif hash[key].is_a? Array
               completed[key] = sync_array( hash[key], value.first )
             end          
@@ -159,7 +159,7 @@ module Gcmd
     #   makes use of ordered hashes.
     #    
     # Sorts an array based on the provided template.
-    # @see #sync_dif_hash
+    # @see #sync_with_template
     
     def sync_array( array, template=nil )
       
@@ -170,7 +170,7 @@ module Gcmd
           if item.is_a? String
             data << item
           elsif item.is_a? Hash
-            data << sync_dif_hash( item, template )
+            data << sync_with_template( item, template )
           end
         end
       else
