@@ -84,15 +84,15 @@ describe Gcmd::Schema do
         
       end
       
-      context "#unbounded" do
+      context "#generate_unbounded" do
         
         it "should return an array" do
-          subject.unbounded.should be_a_kind_of( Array )
+          subject.generate_unbounded.should be_a_kind_of( Array )
         end
         
         it "should contain unbounded elements" do
-          subject.unbounded.should include( "IDN_Node", "Chronostratigraphic_Unit", "Personnel", "Email" )
-        end        
+          subject.generate_unbounded.should include( "IDN_Node", "Chronostratigraphic_Unit", "Personnel", "Email" )
+        end
         
       end
       
