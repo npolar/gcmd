@@ -45,7 +45,6 @@ describe Gcmd::HashBuilder do
       
       it "should return an array" do
         subject.document_to_object.should be_a_kind_of( Array )
-        puts subject.document_to_object.to_json
       end
       
       it "the result array should consist of Hashes" do
