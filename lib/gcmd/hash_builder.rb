@@ -67,13 +67,14 @@ module Gcmd
     end
     
     # Recursive method that walks the XML tree and generates an output Hash
-    # @see #handle_multiples
+    # Unbounded elements are represented as Arrays even if containing only one
+    # value.
     
     def hash_from_xml( element )
       result = {}
       
       element.each do |node|
-        unless excluded?( node.name )   
+        unless excluded?( node.name )
           
           result[ node.name ] = [] if unbounded?( node.name ) && result[ node.name ].nil?
 
@@ -96,7 +97,6 @@ module Gcmd
       
       result
     end
-    
     
     protected
     
