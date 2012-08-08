@@ -25,13 +25,14 @@ module Gcmd
   class Schema < Gcmd::Tools
     
     # Default DIF schema (DIF version 9.8.3)
-    XSD = "lib/gcmd/dif.xsd"
+    XSD = "dif.xsd"
     
-    attr_accessor :info
+    attr_accessor :info, :unbounded
     
     def initialize( xml_schema = XSD )
       self.schema=xml_schema
       self.info = generate_info( root )
+      self.unbounded = generate_unbounded
     end
     
     def schema
@@ -97,8 +98,8 @@ module Gcmd
     
     # Returns an array with unbounded elements
     
-    def unbounded      
-      elements = []      
+    def generate_unbounded
+      elements = []
 
       info.each do | key, value |
         elements << key if value["unbounded"]
