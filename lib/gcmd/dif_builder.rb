@@ -139,9 +139,9 @@ module Gcmd
               completed[key] = sync_with_template( hash[key], value )
             elsif hash[key].is_a? Array
               completed[key] = sync_array( hash[key], value.first )
-            end          
+            end
           else
-            completed[key] = value          
+            completed[key] = value
           end
         end
         
