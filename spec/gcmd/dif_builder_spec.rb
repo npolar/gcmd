@@ -33,16 +33,8 @@ describe Gcmd::DifBuilder do
         subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "<Entry_ID>Enter-the-ID</Entry_ID>" )
       end
       
-      context "it should contain all required fields" do        
-        
-        Gcmd::DifBuilder::REQUIRED.each do | required_element |
-          
-          it required_element do
-            subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "\<#{ required_element }\>" )
-          end
-          
-        end
-        
+      it "should provide a complete DIF representation including fields not in the input" do        
+        subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "<Personnel>", "<ISO_Topic_Category>", "<Paleo_Temporal_Coverage>" )
       end
       
     end
