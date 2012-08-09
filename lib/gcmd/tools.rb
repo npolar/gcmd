@@ -25,7 +25,7 @@ module Gcmd
 
     def load_xml( source, uri = false )
       begin
-
+        
         if uri or source =~ /^http(s)?\:\/\//
           Nokogiri::XML::Document.parse( open( source ).read, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
         else
@@ -33,27 +33,27 @@ module Gcmd
           Nokogiri::XML::Document.parse( source, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
         end
         
-      rescue        
-        raise ArgumentError, "Invalid Source"        
-      end      
+      rescue => e
+        raise ArgumentError, "Invalid Source: " + e.message
+      end
     end
     
     # Load DIF JSON from source (File_path|string|URI)
     # This returns a Ruby Hash object
 
-    def load_json( source, uri = false )      
+    def load_json( source, uri = false )
       begin
         
         if uri or source =~ /^http(s)?\:\/\//
           JSON.parse( open( source ).string )
         else
-          source = File.read( source ) if File.exists? source          
+          source = File.read( source ) if File.exists? source
           JSON.parse( source )
         end
         
-      rescue
-        raise ArgumentError, "Invalid Source"
-      end      
+      rescue => e
+        raise ArgumentError, "Invalid Source: " + e.message
+      end
     end
     
   end
