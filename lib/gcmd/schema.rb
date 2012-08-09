@@ -25,7 +25,7 @@ module Gcmd
   class Schema < Gcmd::Tools
     
     # Default DIF schema (DIF version 9.8.3)
-    XSD = "lib/gcmd/dif.xsd"
+    XSD = File.dirname(__FILE__) + "/../../data/dif.xsd"
     
     attr_accessor :info, :unbounded, :file
     
