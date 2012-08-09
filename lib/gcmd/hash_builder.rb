@@ -24,13 +24,7 @@ module Gcmd
     
     XPATH = "//dif:DIF"
     
-    # Field Presets
-    
     EXCLUDED = ["Fax", "Postal_Code", "Phone", "Multimedia_Sample", "Paleo_Temporal_Coverage"]
-    
-    RECOMMENDED = ["DIF_Creation_Date", "DIF_Revision_History", "Future_DIF_Review_Date", "IDN_Node", "Keyword", "Last_DIF_Revision_Date", "Multimedia_Sample", "Parent_DIF", "Reference"]
-
-    REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category", "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
     
     attr_accessor :document, :schema
     
