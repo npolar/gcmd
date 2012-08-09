@@ -7,7 +7,7 @@ This software library tries to tackle 4 major issues while working with GCMD.
 
 * Generating hashses from DIF (XML) metadata documents.
 * Creation of DIF (XML) from DIF formatted data hashes.
-* Validation, information collection and template generation based on DIF's XML schema.
+* Information collection and template generation based on DIF's XML schema.
 * Working with GCMD's online KMS (Keyword Management System) service.
 
 
