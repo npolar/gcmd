@@ -6,7 +6,10 @@ gem "nokogiri"
 gem "rack-cache"
 gem "uuidtools"
 gem "yajl-ruby" # https://github.com/brianmario/yajl-ruby
+
+## Documentation
 gem "yard"
+gem "redcarpet"
 
 group :development, :test do
   gem "shotgun"
