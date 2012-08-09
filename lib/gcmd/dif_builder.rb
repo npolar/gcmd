@@ -21,9 +21,6 @@ module Gcmd
   
   class DifBuilder < Gcmd::Tools
     
-    REQUIRED = ["Data_Center", "Entry_ID", "Entry_Title", "ISO_Topic_Category",
-                "Metadata_Name", "Metadata_Version", "Parameters", "Summary"]
-    
     NAMESPACE = "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
     
     VERSION = "9.8.3"
