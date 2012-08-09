@@ -22,7 +22,7 @@ describe Gcmd::Tools do
         end
         
         it "should accept data from a file" do
-          subject.load_xml( "spec/data/dif.xml" ).should be_a_kind_of( Nokogiri::XML::Document )
+          subject.load_xml( "spec/data/dif_record.xml" ).should be_a_kind_of( Nokogiri::XML::Document )
         end
         
         it "should accept string formatted data"do
