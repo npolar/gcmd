@@ -16,7 +16,7 @@ This software library tries to tackle 4 major issues while working with GCMD.
 
 ### Generating DIF hashes
 
-The [Gcmd::HashBuilder]() class enables you to generate hashes from a XML containing a single or
+The [Gcmd::HashBuilder](https://github.com/npolar/gcmd/blob/master/lib/gcmd/hash_builder.rb) class enables you to generate hashes from a XML containing a single or
 multiple DIF metadata records. The return format is always an Array containing the doucment Hashes
 even if only one DIF record is provided!
 
@@ -36,7 +36,7 @@ in the code. Mainly resetting some presets to your needs._
 
 ### Generating DIF (XML) from DIF Hashes
 
-The [Gcmd::DifBuilder]() class can be used to generate a DIF (XML) document from a DIF Hash. So in order
+The [Gcmd::DifBuilder](https://github.com/npolar/gcmd/blob/master/lib/gcmd/dif_builder.rb) class can be used to generate a DIF (XML) document from a DIF Hash. So in order
 for this to work you need to make sure that the keys in your hash match the elements that occur in
 DIF. The result is a String containing the XML.
 
