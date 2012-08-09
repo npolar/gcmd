@@ -11,6 +11,10 @@ module Gcmd
   # [License]
   #   This code is licensed under the {http://www.gnu.org/licenses/gpl.html GNU General Public License Version 3} (GPLv3)
   #
+  # @see http://gcmd.gsfc.nasa.gov/User/difguide/difman.html DIF Guide
+  # @see http://gcmd.nasa.gov/Aboutus/xml/dif/dif.xsd DIF XML Schema
+  # @see http://gcmd.nasa.gov/Aboutus/ About GCDM
+  #
   # @author Ruben Dens
   # @author Conrad Helgeland
   
