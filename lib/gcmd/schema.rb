@@ -25,12 +25,13 @@ module Gcmd
   class Schema < Gcmd::Tools
     
     # Default DIF schema (DIF version 9.8.3)
-    XSD = "dif.xsd"
+    XSD = "lib/gcmd/dif.xsd"
     
-    attr_accessor :info, :unbounded
+    attr_accessor :info, :unbounded, :file
     
     def initialize( xml_schema = XSD )
-      self.schema=xml_schema
+      self.file = xml_schema
+      self.schema = xml_schema
       self.info = generate_info( root )
       self.unbounded = generate_unbounded
     end
