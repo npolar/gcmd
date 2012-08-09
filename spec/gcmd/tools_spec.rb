@@ -8,11 +8,7 @@ describe Gcmd::Tools do
   subject do
     Gcmd::Tools.new
   end
-  
-  def scheme
-    subject.load_xml( "spec/data/dif.xsd" )
-  end
-  
+    
   context "Importing data" do
     
     context "XML" do
