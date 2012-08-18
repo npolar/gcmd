@@ -1,6 +1,6 @@
 # Ruby GCMD library
 A set of classes for working with NASA's [Global Change Master Directory (GCMD)](http://gcmd.gsfc.nasa.gov/), in
-particular the [Directory Interchange Format](http://gcmd.nasa.gov/Aboutus/xml/dif).
+particular the [Directory Interchange Format](http://gcmd.nasa.gov/User/difguide/).
 
 ## Features
 * DIF XML parsing (to Ruby Hash)
@@ -10,7 +10,7 @@ particular the [Directory Interchange Format](http://gcmd.nasa.gov/Aboutus/xml/d
 
 ## Directory Interchange Format (DIF)
 
-### Generating DIF hashes
+### Parsing DIF XML
 
 The [Gcmd::HashBuilder](https://github.com/npolar/gcmd/blob/master/lib/gcmd/hash_builder.rb) class enables you to generate hashes from a XML containing a single or
 multiple DIF metadata records.
@@ -29,7 +29,7 @@ and can be used to convert basically any xml document into Hashes. This will req
 in the code. Mainly resetting some presets to your needs._
 
 
-### Generating DIF (XML) from DIF Hashes
+### Writing DIF XML
 
 The [Gcmd::DifBuilder](https://github.com/npolar/gcmd/blob/master/lib/gcmd/dif_builder.rb) class can be used to generate a DIF (XML) document from a DIF Hash. So in order
 for this to work you need to make sure that the keys in your hash match the elements that occur in
