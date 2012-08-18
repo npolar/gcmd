@@ -1,24 +1,19 @@
 # Ruby GCMD library
-A set of classes for working with NASA's [Global Change Master Directory (GCMD)](http://gcmd.gsfc.nasa.gov/).
+A set of classes for working with NASA's [Global Change Master Directory (GCMD)](http://gcmd.gsfc.nasa.gov/), in
+particular the [Directory Interchange Format](http://gcmd.nasa.gov/Aboutus/xml/dif).
 
-## Functionality
-
-This software library tries to tackle 4 major issues while working with GCMD.
-
-* Generating hashses from DIF (XML) metadata documents.
-* Creation of DIF (XML) from DIF formatted data hashes.
-* Information collection and template generation based on DIF's XML schema.
-* Working with GCMD's online KMS (Keyword Management System) service.
-
+## Features
+* DIF XML parsing (to Ruby Hash)
+* DIF XML writing (from Ruby Hash)
+* Bullet- and futureproof XML handling by direct use of DIF's XML Schema
+* Integration with GCMD's new KMS (Keyword Management System) service
 
 ## Directory Interchange Format (DIF)
-
 
 ### Generating DIF hashes
 
 The [Gcmd::HashBuilder](https://github.com/npolar/gcmd/blob/master/lib/gcmd/hash_builder.rb) class enables you to generate hashes from a XML containing a single or
-multiple DIF metadata records. The return format is always an Array containing the doucment Hashes
-even if only one DIF record is provided!
+multiple DIF metadata records.
 
 ``` ruby
 
@@ -84,6 +79,7 @@ other hash data into xml._
 * Ruby >= 1.9.3
 
 ## About
+This library is developed by the Datacenter staff at the Norwegian Polar Institute(http://npolar.no/).
 
 ### Credits
 
