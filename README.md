@@ -70,7 +70,7 @@ other hash data into xml._
 
 The [Gcmd::Schema](https://github.com/npolar/gcmd/blob/master/lib/gcmd/schema.rb) class offers the
 posibility to validate DIF through the `#validate_xml` method. This works for both single DIF documents
-as for multiple documents in a container like OAI-PMH. The Method returns an array of hashes containing
+as for multiple documents in a container like OAI-PMH. The method returns an array of hashes containing
 validation information for each DIF.
 
 ``` ruby
