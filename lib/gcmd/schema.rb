@@ -24,6 +24,10 @@ module Gcmd
 
   class Schema < Gcmd::Tools
     
+    NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
+    
+    XPATH = "//dif:DIF"
+    
     # Default DIF schema (DIF version 9.8.3)
     XSD = File.dirname(__FILE__) + "/../../data/dif.xsd"
     
@@ -125,7 +129,36 @@ module Gcmd
       elements
     end
     
+    def validate_xml( xml = nil )
+      errors = []
+      
+      raise ArgumentError, "No XML provided!" if xml.nil?
+      xml = Nokogiri::XML::Document.parse( xml ) unless xml.is_a?( Nokogiri::XML::Document )
+      
+      xml.xpath( XPATH, NAMESPACE ).each_with_index do | node, index |
+        errs = nokogiri_schema.validate( Nokogiri::XML::Document.parse( node.to_s ) )
+        
+        errors << {
+          "Entry_Title" => node.xpath(".//dif:Entry_Title", NAMESPACE).first.text,
+          "Entry_ID" => node.xpath(".//dif:Entry_ID", NAMESPACE).first.text
+        }
+        
+        if errs.any?
+          errors[index][:message] = "This document is not valid!"
+          errors[index][:errors] = errs
+        else
+          errors[index][:message] = "This document is valid!"
+        end
+      end
+      
+      errors
+    end
+    
     protected
+    
+    def nokogiri_schema
+      Nokogiri::XML::Schema( File.read( file ) )
+    end
     
     def has_children?( name )
       return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType/xs:sequence").any?
