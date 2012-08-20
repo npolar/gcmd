@@ -179,6 +179,49 @@ describe Gcmd::Schema do
       
     end
     
-  end  
+    context "Validation" do
+      
+      context "#nokogiri_schema" do
+        
+        it "should return a document of the Nokogiri::XML::Schema type" do
+          subject.send( :nokogiri_schema ).should be_a_kind_of( Nokogiri::XML::Schema )
+        end
+        
+      end
+      
+      context "#validate_xml" do
+        
+        before(:each) do
+          @xml = Gcmd::Tools.new.load_xml( "spec/data/dif_record.xml" )
+        end
+        
+        it "should return an array" do
+          subject.validate_xml(@xml).should be_a_kind_of( Array )
+        end
+        
+        it "should raise an ArgumentError if no XML is provided" do
+          expect{ subject.validate_xml }.to raise_error( ArgumentError )
+        end
+        
+        it "should return a valid message when the xml passes validation" do
+          subject.validate_xml(@xml).first.should include( :message => "This document is valid!" )
+        end
+        
+        it "should return a list of errors when the xml is not valid" do
+          data = Gcmd::Tools.new.load_xml( "spec/data/invalid_dif.xml" )
+          subject.validate_xml( data ).first.should include( :errors )
+        end
+        
+        # Needs to work in case of harvesting formats like OAI-PMH
+        it "should validate multiple DIF's in one document" do
+          data = Gcmd::Tools.new.load_xml( "spec/data/invalid_dif.xml" )
+          subject.validate_xml( data ).last.should include( "Entry_ID" => "2" )
+        end
+        
+      end
+      
+    end
+    
+  end
   
 end
