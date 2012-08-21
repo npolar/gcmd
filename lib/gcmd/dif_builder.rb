@@ -25,9 +25,10 @@ module Gcmd
     
     VERSION = "9.8.3"
     
-    attr_accessor :schema, :hash_template
+    attr_accessor :schema, :hash_template, :data_hash
     
-    def initialize
+    def initialize( dif_hash = nil )
+      self.data_hash = dif_hash
       self.schema = Gcmd::Schema.new
       self.hash_template = schema.hash_template
     end
@@ -37,13 +38,13 @@ module Gcmd
     # @see #build_xml
     # @see #sync_with_template
     
-    def build_dif( dif_hash = nil )
+    def build_dif( dif_hash = data_hash )
       unless dif_hash.nil?
-        dif_hash = sync_with_template( dif_hash, hash_template )        
+        dif_hash = sync_with_template( dif_hash, hash_template )
         build_xml( dif_hash )
       else
-        raise ArgumentError, "No data provided" 
-      end    
+        raise ArgumentError, "No data provided"
+      end
     end
     
     # @todo Extract root node declaration and make completely generic
@@ -52,24 +53,22 @@ module Gcmd
     # the Nokogiri::XML::Builder class.
     # @see #build_from_hash
       
-    def build_xml( data_hash = nil )      
+    def build_xml( data_hash = nil )
       unless data_hash.nil?
-        
         builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do | xml |
           
           xml.DIF(:xmlns => NAMESPACE,
             "xsi:schemaLocation" => "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd",
-            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {          
-
-            build_from_hash( xml, data_hash )          
+            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {
+            build_from_hash( xml, data_hash )
           }
           
-        end        
+        end
       else
         raise ArgumentError, "No Hash data provided!"
       end
       
-      builder.to_xml      
+      builder.to_xml
     end
     
     # A recursive function that loops the Hash and detects nested
@@ -156,10 +155,9 @@ module Gcmd
     # @see #sync_with_template
     
     def sync_array( array, template=nil )
-      
       data = []
       
-      if array.any?        
+      if array.any?
         array.each do | item |
           if item.is_a? String
             data << item
@@ -168,7 +166,7 @@ module Gcmd
           end
         end
       else
-        data << template        
+        data << template
       end
       
       data
