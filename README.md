@@ -39,8 +39,8 @@ DIF. The result is a String containing the XML.
 
   require "gcmd/dif_builder"
   
-  builder = Gcmd::DifBuilder.new
-  dif_xml = builder.build_dif( dif_hash )
+  builder = Gcmd::DifBuilder.new( dif_hash )
+  dif_xml = builder.build_dif
 
 ```
 
