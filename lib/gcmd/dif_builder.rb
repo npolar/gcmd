@@ -58,7 +58,7 @@ module Gcmd
         builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do | xml |
           
           xml.DIF(:xmlns => NAMESPACE,
-            "xsi:schemaLocation" => "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd",
+            "xsi:schemaLocation" => schema.schema_location,
             "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {
             build_from_hash( xml, data_hash )
           }
@@ -69,6 +69,10 @@ module Gcmd
       end
       
       builder.to_xml
+    end
+    
+    def self.schema_location
+      "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd"
     end
     
     # A recursive function that loops the Hash and detects nested
