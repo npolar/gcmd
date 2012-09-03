@@ -71,10 +71,6 @@ module Gcmd
       builder.to_xml
     end
     
-    def self.schema_location
-      "#{NAMESPACE} #{NAMESPACE}dif_v#{VERSION}.xsd"
-    end
-    
     # A recursive function that loops the Hash and detects nested
     # Hashes and Arrays. On a nested Hash a recursive call happens
     # on an Array build_from_array is called.
