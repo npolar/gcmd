@@ -28,13 +28,15 @@ module Gcmd
     
     XPATH = "//dif:DIF"
     
+    VERSION = "9.8.3"
+    
     # Default DIF schema (DIF version 9.8.3)
     XSD = File.dirname(__FILE__) + "/../../data/dif.xsd"
     
-    attr_accessor :info, :unbounded, :file
+    attr_accessor :info, :unbounded, :location
     
     def initialize( xml_schema = XSD )
-      self.file = xml_schema
+      self.location = xml_schema
       self.schema = xml_schema
       self.info = generate_info( root )
       self.unbounded = generate_unbounded
@@ -127,7 +129,7 @@ module Gcmd
         end
       end
       elements
-    end
+    end    
     
     def validate_xml( xml = nil )
       errors = []
@@ -140,24 +142,23 @@ module Gcmd
         
         errors << {
           "Entry_Title" => node.xpath(".//dif:Entry_Title", NAMESPACE).first.text,
-          "Entry_ID" => node.xpath(".//dif:Entry_ID", NAMESPACE).first.text
-        }
+          "Entry_ID" => node.xpath(".//dif:Entry_ID", NAMESPACE).first.text,
+          "details" => errs
+        } if errs.any?
         
-        if errs.any?
-          errors[index][:message] = "This document is not valid!"
-          errors[index][:errors] = errs
-        else
-          errors[index][:message] = "This document is valid!"
-        end
       end
       
       errors
     end
     
+    def schema_location
+      "#{NAMESPACE['dif']}dif_v#{VERSION}.xsd"
+    end
+    
     protected
     
     def nokogiri_schema
-      Nokogiri::XML::Schema( File.read( file ) )
+      Nokogiri::XML::Schema( File.read( location ) )
     end
     
     def has_children?( name )
