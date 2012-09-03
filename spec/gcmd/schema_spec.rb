@@ -177,6 +177,14 @@ describe Gcmd::Schema do
         
       end
       
+      context "#schema_location" do
+        
+        it "should return a link to the schema used for validation" do
+          subject.schema_location.should == "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.3.xsd"
+        end
+        
+      end
+      
     end
     
     context "Validation" do
@@ -203,13 +211,13 @@ describe Gcmd::Schema do
           expect{ subject.validate_xml }.to raise_error( ArgumentError )
         end
         
-        it "should return a valid message when the xml passes validation" do
-          subject.validate_xml(@xml).first.should include( :message => "This document is valid!" )
+        it "should be an empty array when the xml passes validation" do
+          subject.validate_xml(@xml).any?.should == false
         end
         
-        it "should return a list of errors when the xml is not valid" do
+        it "should return an array of errors when the xml is not valid" do
           data = Gcmd::Tools.new.load_xml( "spec/data/invalid_dif.xml" )
-          subject.validate_xml( data ).first.should include( :errors )
+          subject.validate_xml( data ).any?.should == true
         end
         
         # Needs to work in case of harvesting formats like OAI-PMH
