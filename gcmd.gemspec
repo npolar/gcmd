@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "gcmd"
-  s.version     = "0.0.2.1"
+  s.version     = "0.1.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Conrad Helgeland", "Ruben Dens"]
   s.email       = [""]
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 2.0"
 
   s.files        = Dir.glob("{lib}/**/*") + %w(README.md)
-  #s.executables  = ['']
+  s.executables      = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths      = ["lib"]
   git_files            = `git ls-files`.split("\n") rescue ''
   s.files              = git_files # + whatever_else
