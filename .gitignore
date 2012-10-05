@@ -5,15 +5,15 @@
 coverage
 InstalledFiles
 lib/bundler/man
+lib/gcmd/_concepts
 pkg
 rdoc
 spec/reports
 test/tmp
 test/version_tmp
 tmp
-
+Gemfile.lock
 # YARD artifacts
 .yardoc
 _yardoc
 doc/
-lib/gcmd/concepts

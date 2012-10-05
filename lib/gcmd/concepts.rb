@@ -1,8 +1,7 @@
-#encoding: utf-8
-
 require "nokogiri"
 require "fileutils"
 require "digest/sha1"
+require "logger"
 
 module Gcmd
   class Concepts
@@ -25,13 +24,18 @@ module Gcmd
       "isotopiccategory", "rucontenttype", "horizontalresolutionrange",
       "verticalresolutionrange", "temporalresolutionrange"].sort
 
-    attr_accessor :base, :cache, :http
+    attr_accessor :base, :cache, :http, :log
+
+    def self.schemas
+      ROOT_SCHEMES
+    end
     
     def initialize(base=BASE, cache=CACHE)
       @base = base
       @cache = cache
       @http = Http.new(base)
-
+      @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
+      
       unless false == cache
         add_concepts_from_cache
       end
@@ -109,8 +113,14 @@ module Gcmd
       else
         r = ng.xpath("//skos:Concept[skos:broader]", NAMESPACE)
       end
-      r = r.map {|r| [r.xpath("@rdf:about").to_s , r.xpath("./skos:prefLabel[@xml:lang='en']").text ]}
+      r = r.map {|r| [r.xpath("@rdf:about").to_s , r.xpath("./skos:prefLabel[@xml:lang='en']").text, r.xpath("./skos:definition[@xml:lang='en']").text  ]}
       r.select {|r| r[1] != "Trash Can" }
+    end
+    alias :triples :narrower
+
+
+    def tuples(scheme)
+      narrower(scheme).map {|c| [c[0], c[1]]}
     end
 
     def narrower_names(scheme="root")
@@ -124,8 +134,9 @@ module Gcmd
     def fetch_all
       f = []
       version = VERSION
-      (["root"]+schemes).each do | uri |
-        f << fetch(uri)
+      (["root"]+schemes).each do | scheme |
+        log.debug "About to fetch: #{scheme}"
+        f << fetch(scheme)
       end
       f
     end
@@ -135,6 +146,7 @@ module Gcmd
       if uri.nil?
         uri = base+scheme+"?format=rdf"
       end
+      log.debug uri
       xml = get(uri)
 
       # Once the source provide a datestamp, we should set the file date to that
@@ -153,10 +165,23 @@ module Gcmd
       unless File.exists? dir
         FileUtils.mkpath dir
       end
+      
+      if File.exists? filename
+        existing_sha1 = Digest::SHA1.hexdigest File.read(filename)
+        log.debug "Existing SHA-1: #{existing_sha1}"
+      end
 
-      f = File.open(filename, "w")
-      f.write(data)
-      f.close
+      if existing_sha1.nil? or existing_sha1 != sha1
+
+        # if self.valid? data
+
+        f = File.open(filename, "w")
+        f.write(data)
+        f.close
+        log.debug "Saved: #{filename}"
+      else
+        log.debug "No change: #{filename}" 
+      end
     end
 
     def schemes(scheme="root")
@@ -178,6 +203,10 @@ module Gcmd
 
     def version
       @version ||= VERSION
+    end
+
+    def validate(xml)
+
     end
   
   end

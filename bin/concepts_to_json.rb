@@ -1,10 +1,7 @@
 #!/usr/bin/env ruby
 require "bundler/setup"
 require "yajl/json_gem"
-
-require "./../lib/gcmd/exception"
-require "./../lib/gcmd/http"
-require "./../lib/gcmd/concepts"
+require_relative "./../lib/gcmd"
 
 docs = []
 Gcmd::Concepts.schemas.each do |schema|

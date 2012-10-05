@@ -1,4 +1,3 @@
-require "gcmd/tools"
 require "nokogiri"
 
 module Gcmd

@@ -7,5 +7,6 @@ SimpleCov.start do
 end
 ENV.delete "GCMD_HTTP_PASSWORD"
 ENV.delete "GCMD_HTTP_USERNAME"
+ENV["GCMD_ENV"] = "test"
 
 ::Faraday.default_adapter = :test

@@ -1,5 +1,6 @@
 # encoding: utf-8
 require File.dirname(__FILE__) + "/../spec_helper"
+require "gcmd/exception"
 require "gcmd/http"
 require "gcmd/concepts"
 
@@ -72,7 +73,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   context "#root" do
     it "should list root concepts" do
-      subject.root.last.should == ["fb0b9fcd-5c96-4989-8c64-a479bbed83ab", "Projects"]
+      subject.root.last.should == ["fb0b9fcd-5c96-4989-8c64-a479bbed83ab", "Projects", ""]
     end
   end
 

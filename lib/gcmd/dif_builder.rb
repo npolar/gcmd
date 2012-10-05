@@ -1,6 +1,3 @@
-require "gcmd/tools"
-require "gcmd/schema"
-
 require "nokogiri"
 
 module Gcmd
