@@ -33,8 +33,8 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   context "errors" do
     it "adding concept without skos:Concept should raise Gcmd::Exception" do
-      expect { subject.addConcept("root", '<concepts xsi:noNamespaceSchemaLocation="http://gcmd.nasa.gov/kms/gcmd.xsd"></concepts>')
-        }.to raise_exception(Gcmd::Exception)
+      lambda { subject.addConcept("root", '<concepts xsi:noNamespaceSchemaLocation="http://gcmd.nasa.gov/kms/gcmd.xsd"></concepts>')
+        }.should raise_exception(Gcmd::Exception)
     end
   end
 
@@ -109,8 +109,24 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
       subject.cache = "/tmp/gcmd-concepts-test"
       subject.http = http 
       subject.fetch("concept1").should == "a9e8d58c35547b3c61014fa590cd519a587dd75b"
+    end
+
+    it "fetching invalid Concept XML should raise Gcmd::Exception" do
+      subject.http = double("http", :get => "__INVALID__")
+      lambda {subject.fetch("invalid1")}.should raise_exception(Gcmd::Exception)
 
     end
 
+  end
+
+  context "Class methods" do
+    context "Gcmd::Concepts.valid?" do
+      it "true on valid Concept XML" do
+        Gcmd::Concepts.valid?(CONCEPT1).should == true
+      end
+      it "false on invalid Concept XML" do
+        Gcmd::Concepts.valid?("_").should == false
+      end
+    end
   end
 end

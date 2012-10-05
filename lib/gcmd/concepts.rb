@@ -48,10 +48,9 @@ module Gcmd
       if File.exists? xml
         xml = File.open(xml).read
       end
-      unless xml =~ /http\:\/\/www.w3.org\/2004\/02\/skos\/core#/
+      unless self.class.valid? xml
         raise Exception, "Added #{scheme} XML does not contain a skos:Concept"
       end
-
       @concept[scheme] = xml
     end
 
@@ -105,7 +104,6 @@ module Gcmd
       narrower("providers")
     end
 
-
     def narrower(scheme="root")
       ng = Nokogiri::XML concept(scheme)
       if "root" == scheme
@@ -155,7 +153,13 @@ module Gcmd
       filename = File.join(cache, version, scheme)
       
       sha1 = Digest::SHA1.hexdigest xml
-      save(filename, xml, sha1)
+
+      if self.class.valid? xml
+        save(filename, xml, sha1)
+      else
+        log.error("Invalid #{scheme} XML from #{uri}:\n#{xml}")
+        raise Gcmd::Exception, "Refuse to save invalid concept #{scheme} (version:#{version})"
+      end
 
       sha1
     end
@@ -205,7 +209,16 @@ module Gcmd
       @version ||= VERSION
     end
 
-    def validate(xml)
+    def self.valid?(xml)
+      if xml =~ /http\:\/\/www.w3.org\/2004\/02\/skos\/core#/
+        begin
+          Nokogiri::XML(xml).xpath("//skos:Concept").size >= 1
+        rescue => e
+          false
+        end
+      else
+        false
+      end
 
     end
   
