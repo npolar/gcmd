@@ -39,8 +39,8 @@ DIF. The result is a String containing the XML.
 
   require "gcmd/dif_builder"
   
-  builder = Gcmd::DifBuilder.new
-  dif_xml = builder.build_dif( dif_hash )
+  builder = Gcmd::DifBuilder.new( dif_hash )
+  dif_xml = builder.build_dif
 
 ```
 
@@ -65,6 +65,27 @@ This will generate an XML without any ordering or completion happening.
 
 **NOTE!**  _The code for the conversions is fairly generic and could be easily adapted to convert
 other hash data into xml._
+
+### Validating DIF XML
+
+The [Gcmd::Schema](https://github.com/npolar/gcmd/blob/master/lib/gcmd/schema.rb) class offers the
+posibility to validate DIF through the `#validate_xml` method. This works for both single DIF documents
+as for multiple documents in a container like OAI-PMH. The method returns an array of hashes containing
+validation information for each DIF.
+
+``` ruby
+
+  require "gcmd/schema"
+  
+  schema = Gcmd::Schema.new
+  report = schema.validate_xml( xml_data )
+  report.to_json
+
+```
+
+**NOTE!** _In the example above the schema class is initialized with the default xml schema
+***(DIF v9.8.3)***. In order to validate against a different version of DIF do the following
+`schema = Gcmd::Schema.new( "schema.xsd" )`._
 
 
 ## HTTP services
