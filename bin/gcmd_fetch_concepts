@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+#
+# Fetches GCMD Concepts (RDF XML) to a local disk cache
+#
+# Usage:
+#   $ ~/github.com/gcmd$ ./bin/gcmd_fetch_concepts [username] [password] [cache]
+#
 require "bundler/setup"
 require_relative "./../lib/gcmd"
 
@@ -7,7 +13,7 @@ begin
   concepts = Gcmd::Concepts.new
 
   # Change cache location
-  concepts.cache = "/tmp/gcmd-concepts-cache"
+  # concepts.cache = "/tmp/gcmd-concepts-cache"
 
   # Change log (default is STDERR)
   # log = Logger.new("/dev/null")
