@@ -9,7 +9,7 @@ module Gcmd
     # http://gcmdservices.gsfc.nasa.gov/kms/concept_versions/all
     VERSION = "Jun122012"
 
-    CACHE = File.join(File.dirname(__FILE__)+"/_concepts")
+    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= File.join(File.dirname(__FILE__)+"/_concepts")
 
     BASE = Http::BASE + "/kms/concepts/"
 
@@ -19,7 +19,7 @@ module Gcmd
       "skos" => "http://www.w3.org/2004/02/skos/core#"
     }
 
-    ROOT_SCHEMES = ["chronounits", "sciencekeywords", "locations", "providers",
+    ROOT_SCHEMAS = ["chronounits", "sciencekeywords", "locations", "providers",
       "platforms", "instruments", "projects", "discipline", "idnnode",
       "isotopiccategory", "rucontenttype", "horizontalresolutionrange",
       "verticalresolutionrange", "temporalresolutionrange"].sort
@@ -27,12 +27,25 @@ module Gcmd
     attr_accessor :base, :cache, :http, :log
 
     def self.schemas
-      ROOT_SCHEMES
+      ROOT_SCHEMAS
+    end
+
+    def self.valid?(xml)
+      if xml =~ /http\:\/\/www.w3.org\/2004\/02\/skos\/core#/
+        begin
+          Nokogiri::XML(xml).xpath("//skos:Concept").size >= 1
+        rescue => e
+          false
+        end
+      else
+        false
+      end
+
     end
     
-    def initialize(base=BASE, cache=CACHE)
-      @base = base
-      @cache = cache
+    def initialize
+      @base = BASE
+      @cache = CACHE
       @http = Http.new(base)
       @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
       
@@ -46,6 +59,8 @@ module Gcmd
         @concept = {}
       end
       if File.exists? xml
+        f = File.open(xml)
+        f.set_encoding("UTF-8")
         xml = File.open(xml).read
       end
       unless self.class.valid? xml
@@ -55,7 +70,7 @@ module Gcmd
     end
 
     def add_concepts_from_cache
-      (["root"]+ROOT_SCHEMES).each do |scheme|
+      (["root"]+self.class.schemas).each do |scheme|
         filename = File.join(cache, version, scheme)
           if File.exists? filename
             addConcept(scheme, filename)
@@ -77,7 +92,7 @@ module Gcmd
     def filter(scheme, q, range = 0..99)
       q = q.gsub(/\W/, "")
       regexp = /#{q}/ui
-      narrower(scheme).select {|c| c[1] =~ regexp }[range]
+      tuples(scheme).select {|c| c[1] =~ regexp }[range]
     end
 
     def get(uri)
@@ -121,7 +136,7 @@ module Gcmd
       narrower(scheme).map {|c| [c[0], c[1]]}
     end
 
-    def narrower_names(scheme="root")
+    def names(scheme="root")
       narrower(scheme).map {|c|c[1]}
     end
 
@@ -130,41 +145,51 @@ module Gcmd
     end
 
     def fetch_all
+
+      log.debug "Fetching all GCMD Concepts (RDF XML) to #{cache}"
+
       f = []
       version = VERSION
-      (["root"]+schemes).each do | scheme |
-        log.debug "About to fetch: #{scheme}"
+      (["root"]+schemas).each do | scheme |
+        log.debug "#{self.class.name}#fetch_all [#{scheme}]"
         f << fetch(scheme)
       end
+      log.debug "Finished #fetch_all"
       f
     end
 
     def fetch(scheme, uri=nil)
+
       base = scheme != "root" ? BASE+"concept_scheme/" : BASE
+
       if uri.nil?
         uri = base+scheme+"?format=rdf"
       end
-      log.debug uri
+      log.debug "#{self.class.name}#fetch #{uri}"
+      
       xml = get(uri)
 
-      # Once the source provide a datestamp, we should set the file date to that
-      addConcept(scheme, xml)
-      version = keywordVersion(scheme)
-      filename = File.join(cache, version, scheme)
-      
-      sha1 = Digest::SHA1.hexdigest xml
-
       if self.class.valid? xml
-        save(filename, xml, sha1)
+
+        # The source does not provide ETag or Last-Modified :/
+        
+        addConcept(scheme, xml)
+  
+        version = keywordVersion(scheme) 
+  
+        filename = File.join(cache, version, scheme)
+        
+        status = save(filename, xml)
+        
       else
         log.error("Invalid #{scheme} XML from #{uri}:\n#{xml}")
         raise Gcmd::Exception, "Refuse to save invalid concept #{scheme} (version:#{version})"
       end
+      status
 
-      sha1
     end
 
-    def save(filename, data, sha1=nil)
+    def save(filename, data)
       dir = File.dirname(filename)
       unless File.exists? dir
         FileUtils.mkpath dir
@@ -175,29 +200,25 @@ module Gcmd
         log.debug "Existing SHA-1: #{existing_sha1}"
       end
 
-      if existing_sha1.nil? or existing_sha1 != sha1
+      new_sha1 = Digest::SHA1.hexdigest data
 
-        # if self.valid? data
-
+      if false == File.exists?(filename) or existing_sha1 != new_sha1
         f = File.open(filename, "w")
-        f.write(data)
-        f.close
+        size = f.write(data)
+        f.close 
         log.debug "Saved: #{filename}"
+        ret = (size > 0) ? true : false
+        
       else
-        log.debug "No change: #{filename}" 
+        log.debug "No change/not saved: #{filename}"
+        ret = true
       end
+      ret
+      
     end
 
-    def schemes(scheme="root")
-      if "root" == scheme and false == concept?("root")
-        return ROOT_SCHEMES
-      end
-      unless concept? scheme
-        raise Exception, "Concept #{scheme} is missing"
-      end
-      ng = Nokogiri::XML concept(scheme)
-      schemes = ng.xpath("//skos:Concept/skos:inScheme/@rdf:resource", NAMESPACE).map {|r| r.to_s.split("/concept_scheme/").last }.sort
-      schemes.select {|s| s != "Trash" }
+    def schemas
+      self.class.schemas
     end
 
     def keywordVersion(scheme="root")
@@ -207,19 +228,6 @@ module Gcmd
 
     def version
       @version ||= VERSION
-    end
-
-    def self.valid?(xml)
-      if xml =~ /http\:\/\/www.w3.org\/2004\/02\/skos\/core#/
-        begin
-          Nokogiri::XML(xml).xpath("//skos:Concept").size >= 1
-        rescue => e
-          false
-        end
-      else
-        false
-      end
-
     end
   
   end
