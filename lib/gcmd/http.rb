@@ -11,13 +11,15 @@ module Gcmd
       :request =>
         { "Agent" => "#{self.name}" }
     }
+    attr_accessor :log
     attr_reader :response
     attr_writer :username, :password
 
     def initialize(base=BASE, opts={}, &builder)
       @base = base
       @opts = OPTS.merge(opts)
-      @client = connection(&builder)    
+      @client = connection(&builder)
+      @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
     end
 
     def base
@@ -36,20 +38,17 @@ module Gcmd
     end
   
     def get(uri)      
-
-      @client.basic_auth username, password
-
-      #@client.use FaradayMiddleware::RackCompatible, Rack::Cache::Context,
-      #  :metastore   => metastore,
-      #  :entitystore => entitystore,
-      #  :verbose     => true,
-      #  :ignore_headers => %w[Set-Cookie X-Content-Digest]
-
+      
       if username.nil? or username.empty? or password.nil? or password.empty?
         raise Exception, "Please provide username/password for #{uri}"
       end
 
+      log.debug("GET #{uri} [#{self.class.name}#get] #{username}:#{password.gsub(/./, "*")}")
+
+      @client.basic_auth username, password
+
       @response = @client.get(uri)
+      log.debug [@response.status, @response.headers]
 
       unless [200, 304].include? response.status
         raise Exception, "GET #{connection.url_prefix}#{uri} failed with status: #{response.status}"
@@ -61,21 +60,13 @@ module Gcmd
       @client.host
     end
 
-    def entitystore
-      "file:#{cache_dir}"
-    end
-    
-    def metastore
-     "file:#{cache_dir}-meta"
-    end
-
     def opts
       @opts
     end
 
-    def cache_dir
-      File.join(ENV['TMPDIR'] || "/tmp", host)
-    end
+    #def cache_dir
+    #  File.join(ENV['TMPDIR'] || "/tmp", host)
+    #end
 
     def username
       # export GCMD_HTTP_USERNAME=http_username
