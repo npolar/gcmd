@@ -61,7 +61,7 @@ module Gcmd
       if File.exists? xml
         f = File.open(xml)
         f.set_encoding("UTF-8")
-        xml = File.open(xml).read
+        xml = f.read
       end
       unless self.class.valid? xml
         raise Exception, "Added #{scheme} XML does not contain a skos:Concept"
