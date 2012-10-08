@@ -72,8 +72,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"></rdf:RDF>']}
     end
 
     it "should send If-None-Match"
-    # see https://github.com/mislav/faraday-stack/blob/master/test/caching_test.rb
-
+    
     it "raises Exception on blank username or password" do
       subject.username = nil
       subject.password = nil
