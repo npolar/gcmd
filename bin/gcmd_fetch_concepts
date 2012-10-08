@@ -1,7 +1,29 @@
 #!/usr/bin/env ruby
 require "bundler/setup"
-
 require_relative "./../lib/gcmd"
 
-c = Gcmd::Concepts.new
-c.fetch_all
+begin 
+
+  concepts = Gcmd::Concepts.new
+
+  # Change cache location
+  concepts.cache = "/tmp/gcmd-concepts-cache"
+
+  # Change log (default is STDERR)
+  # log = Logger.new("/dev/null")
+  # concepts.log = log
+  # concepts.http.log = log
+
+  concepts.http.username = ARGV[0] # fallback: ENV["GCMD_HTTP_USERNAME"]
+  concepts.http.password = ARGV[1] # fallback: ENV["GCMD_HTTP_PASSWORD"]
+
+  all = concepts.fetch_all
+
+  status = ((all.size - 1) == Gcmd::Concepts.schemas.size) ? 0 : 1
+
+  exit(status)
+
+rescue => e
+  raise e
+  exit(1)  
+end
