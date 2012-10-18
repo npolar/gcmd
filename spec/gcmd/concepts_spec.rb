@@ -17,9 +17,11 @@ describe Gcmd::Concepts do
 
   CACHE = "/tmp/gcmd-concepts-spec-#{object_id}"
   
+  LAST_INSTRUMENT = "CPI PROBES"
+
   LAST_PROJECT = "ZA ANTARCTIQUE"
 
-  LAST_SCIENCEKEYWORD = "GALACTIC PLANE"
+  LAST_SCIENCEKEYWORD = "GRAVITY ANOMALIES"
 
   CONCEPT1 = '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcmd="http://gcmd.gsfc.nasa.gov/">DUMMY</gcmd:keywordVersion>
@@ -33,8 +35,20 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   NO_PROVIDERS = ["NO/CRYOCLIM", "NO/IMR", "NO/MET", "NO/MF/IMR", "NO/MPE/NVE", "NO/NGU", "NO/NILU", "NO/NINA", "NO/NIVA", "NO/NIVA/AKVAPLAN", "NO/NMA", "NO/NMDC/IMR", "NO/NPCA/SOE", "NO/NPI", "NO/NR", "NO/SN"]
 
-  def concept(schema, version="Jun122012")
+  def concept(schema, version=Gcmd::Concepts::VERSION)
     File.join(File.dirname(__FILE__), "../../lib/gcmd/_concepts/", version, schema)
+  end
+
+  context "#collection" do
+    it "Array of Atomic hashes" do
+      subject.collection("instruments")[77].should == {:id=>"00c994a8-64eb-4263-a3fa-85fd902bb91b", :label=>"GTR",
+        :title=>"GTR (Instruments > In Situ/Laboratory Instruments > Recorders/Loggers)", :summary=>"",
+        :narrower_ids=>[], :changeNote=>"", :collection=>"instruments", :workspace=>:gcmd, :version=>"7.0",
+        :lang=>:en, :tree=>:leaf, :narrower=>[],
+        :ancestors=>["Recorders/Loggers", "In Situ/Laboratory Instruments", "Instruments"],
+        :ancestor_ids=>["ebfff02c-2e5a-476e-aafb-c00167bf2daa", "ff564c87-78f2-47eb-a857-a4bdc0a71ae5", "b2140059-b3ca-415c-b0a7-3e142783ffe8"]
+      }
+    end
   end
 
   context "#concept" do
@@ -100,6 +114,10 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     it "should list schemas" do
       subject.schemas.should == ROOT_SCHEMAS
     end
+    it "should include root given true or 'root'" do
+      subject.schemas(true).should == ["root"] + ROOT_SCHEMAS
+      subject.schemas("root").should == ["root"] + ROOT_SCHEMAS
+    end
   end
 
   context "#projects" do
@@ -111,7 +129,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   context "#keywordVersion" do
     it "should return the keyword version" do
-      subject.keywordVersion.should == "Jun122012"
+      subject.keywordVersion.should == "7.0"
     end
   end
 
@@ -147,8 +165,9 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     it "should save Concept XML to disk cache" do
       filename = File.join(CACHE, "DUMMY", "concept1")
       subject.fetch("concept1")
-      #File.exists?(filename).should == true
+      File.exists?(filename).should == true
       File.open(filename).read.should == CONCEPT1
+      File.unlink(filename)
     end
 
     it "fetching invalid Concept XML should raise Gcmd::Exception" do
@@ -158,7 +177,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   end
 
-  it "#fetch_all shold call fetch for all schemas + root" do
+  it "#fetch_all should call fetch for all schemas + root" do
     (subject.class.schemas+["root"]).each do | schema |      
       subject.should_receive(:fetch).with(schema)      
     end
@@ -168,7 +187,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
 
   context "#names" do
     it "Array of names" do
-      subject.names("instruments").last.should == "AMSR2"
+      subject.names("instruments").last.should == LAST_INSTRUMENT
     end
   end
   
@@ -183,6 +202,9 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
       subject.save("concept1", data)
       subject.save("concept1", data).should == true
     end
+
+    it "should prepend cache if missing in filename"
+    # the tests above leave stray concept1 files
   
   end
 
@@ -192,7 +214,6 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
         }.should raise_exception(Gcmd::Exception)
     end
   end
-
 
   context "Class methods" do
     context "Gcmd::Concepts.valid?" do

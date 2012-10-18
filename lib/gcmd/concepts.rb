@@ -5,9 +5,14 @@ require "logger"
 
 module Gcmd
   class Concepts
-
     # http://gcmdservices.gsfc.nasa.gov/kms/concept_versions/all
-    VERSION = "Jun122012"
+    #<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    #<versions xsi:noNamespaceSchemaLocation="http://gcmd.nasa.gov/kms/gcmd.xsd">
+    #    <version id="3" creation_date="2012-10-09" type="PUBLISHED">7.0</version>
+    #    <version id="5" creation_date="2012-10-09" type="DRAFT">draft</version>
+    #    <version id="1" creation_date="2012-06-12" type="PAST_PUBLISHED">Jun122012</version>
+    #</versions>
+    VERSION = "7.0"
 
     CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= File.join(File.dirname(__FILE__)+"/_concepts")
 
@@ -26,8 +31,12 @@ module Gcmd
 
     attr_accessor :base, :cache, :http, :log
 
-    def self.schemas
-      ROOT_SCHEMAS
+    def self.schemas(root=false)
+      if root or "root" == root
+        ["root"] + ROOT_SCHEMAS
+      else
+        ROOT_SCHEMAS
+      end
     end
 
     def self.valid?(xml)
@@ -40,18 +49,18 @@ module Gcmd
       else
         false
       end
-
     end
     
-    def initialize
+    def initialize(version=VERSION)
       @base = BASE
       @cache = CACHE
       @http = Http.new(base)
       @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
-      
+      @version = version
       unless false == cache
         add_concepts_from_cache
       end
+      @ng_concept_cache = {}
     end
 
     def addConcept(scheme, xml)
@@ -75,6 +84,65 @@ module Gcmd
           if File.exists? filename
             addConcept(scheme, filename)
           end
+      end
+    end
+
+    def collection(schema)
+
+      collection = ng(schema).xpath("//skos:Concept").map {|concept|
+        
+        id = concept.xpath("@rdf:about").text
+
+        @ng_concept_cache[id] = concept
+
+        summary = concept.xpath("skos:definition[@xml:lang='en']").text
+        title = concept.xpath("skos:prefLabel[@xml:lang='en']").text
+        broader_id = concept.xpath("skos:broader/@rdf:resource").text
+        broader_id = broader_id == "" ? nil : broader_id        
+        narrower_ids = concept.xpath("skos:narrower/@rdf:resource").map {|n| n.to_s }
+        changeNote = concept.xpath("skos:changeNote").text
+
+        if broader_id.nil?
+          tree = :root
+        elsif narrower_ids.any?
+          tree = :branch
+        else
+          tree = :leaf
+        end
+        {
+          :id => id,
+          :label => title,
+          :title => title,
+          :summary => summary,
+          :broader_id => broader_id,
+          :narrower_ids => narrower_ids,
+          :changeNote => changeNote,
+          :collection => schema,
+          :workspace => :gcmd,
+          :version => version,
+          :lang => :en,
+          :tree => tree
+        }
+      }.map do | c |
+        
+        c[:narrower] = c[:narrower_ids].map {|id|
+          @ng_concept_cache[id].xpath("skos:prefLabel[@xml:lang='en']").text
+        }
+        if c[:broader_id].nil?
+          c[:ancestors] = []
+        else
+          c[:broader] = @ng_concept_cache[c[:broader_id]].xpath("skos:prefLabel[@xml:lang='en']").text
+
+          ancestors = recursive_ancestors(schema, c[:broader_id])
+
+          c[:ancestors] = [c[:broader]] + ancestors[:ancestors]
+          c[:ancestor_ids] = [c[:broader_id]] + ancestors[:ids]
+
+          c[:title] = c[:title] +" ("+ c[:ancestors].reverse.join(" > ") +")"
+        end
+        c.delete :broader
+        c.delete :broader_id
+        c
       end
     end
 
@@ -120,11 +188,10 @@ module Gcmd
     end
 
     def narrower(scheme="root")
-      ng = Nokogiri::XML concept(scheme)
       if "root" == scheme
-        r = ng.xpath("//skos:Concept", NAMESPACE)
+        r = ng(scheme).xpath("//skos:Concept", NAMESPACE)
       else
-        r = ng.xpath("//skos:Concept[skos:broader]", NAMESPACE)
+        r = ng(scheme).xpath("//skos:Concept[skos:broader]", NAMESPACE)
       end
       r = r.map {|r| [r.xpath("@rdf:about").to_s , r.xpath("./skos:prefLabel[@xml:lang='en']").text, r.xpath("./skos:definition[@xml:lang='en']").text  ]}
       r.select {|r| r[1] != "Trash Can" }
@@ -217,17 +284,34 @@ module Gcmd
       
     end
 
-    def schemas
-      self.class.schemas
+    def ng(schema)
+      Nokogiri::XML concept(schema)
+    end
+    alias :nokogiri :ng
+
+    def schemas(root=false)
+      self.class.schemas(root)
     end
 
     def keywordVersion(scheme="root")
-      ng = Nokogiri::XML concept(scheme)
-      r = ng.xpath("//gcmd:keywordVersion", {"gcmd" => "http://gcmd.gsfc.nasa.gov/"}).first.text
+      r = ng(scheme).xpath("//gcmd:keywordVersion", {"gcmd" => "http://gcmd.gsfc.nasa.gov/"}).first.text
     end
 
     def version
       @version ||= VERSION
+    end
+
+    protected
+
+    def recursive_ancestors(schema, broader_id, ancestors = [], ids = [])
+      parent = @ng_concept_cache[broader_id].xpath("skos:broader/@rdf:resource").text      
+      if parent.size > 0
+        ids << parent
+        ancestors << @ng_concept_cache[parent].xpath("skos:prefLabel[@xml:lang='en']").text
+        recursive_ancestors(schema, parent, ancestors, ids)
+      else
+        { :ids => ids, :ancestors => ancestors }
+      end
     end
   
   end
