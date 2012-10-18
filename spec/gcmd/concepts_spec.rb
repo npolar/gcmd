@@ -11,11 +11,10 @@ Faraday.default_adapter = :test
 describe Gcmd::Concepts do
   subject do
     concepts = Gcmd::Concepts.new
-    concepts.cache = CACHE
+    #("DUMMY")
+    #concepts.cache = "/tmp/gcmd-concepts-spec-#{object_id}"
     concepts
   end
-
-  CACHE = "/tmp/gcmd-concepts-spec-#{object_id}"
   
   LAST_INSTRUMENT = "CPI PROBES"
 
@@ -39,15 +38,16 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     File.join(File.dirname(__FILE__), "../../lib/gcmd/_concepts/", version, schema)
   end
 
-  context "#collection" do
+  context "#hashify" do
     it "Array of Atomic hashes" do
-      subject.collection("instruments")[77].should == {:id=>"00c994a8-64eb-4263-a3fa-85fd902bb91b", :label=>"GTR",
+      subject.hashify("instruments")[77].should == {:id=>"00c994a8-64eb-4263-a3fa-85fd902bb91b", :label=>"GTR",
         :title=>"GTR (Instruments > In Situ/Laboratory Instruments > Recorders/Loggers)", :summary=>"",
-        :narrower_ids=>[], :changeNote=>"", :collection=>"instruments", :workspace=>:gcmd, :version=>"7.0",
-        :lang=>:en, :tree=>:leaf, :narrower=>[],
+        :child_ids=>[], :edit_comment =>"", :collection => :concept, :concept=>"instruments", :workspace=>:gcmd, :version=>"7.0",
+        :lang=>:en, :tree=>:leaf, :children=>[],
         :ancestors=>["Recorders/Loggers", "In Situ/Laboratory Instruments", "Instruments"],
         :ancestor_ids=>["ebfff02c-2e5a-476e-aafb-c00167bf2daa", "ff564c87-78f2-47eb-a857-a4bdc0a71ae5", "b2140059-b3ca-415c-b0a7-3e142783ffe8"]
       }
+
     end
   end
 
@@ -145,29 +145,21 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     before do
       http = double("http")
       http.stub(:get => CONCEPT1)
-      subject.http = http 
+      subject.http = http
+      subject.version = "DUMMY"     
+      subject.cache = "/tmp/gcmd-concepts-spec-#{object_id}"
     end
-
-    after(:each) do
-      filename = File.join(CACHE, "DUMMY", "concept1")
-      if File.exists? filename
-        File.unlink(filename)
-        Dir.unlink(File.join(CACHE, "DUMMY"))
-        Dir.unlink(CACHE)
-      end
-    end
-
 
     it "should return true on success" do
       subject.fetch("concept1").should == true
     end
 
     it "should save Concept XML to disk cache" do
-      filename = File.join(CACHE, "DUMMY", "concept1")
       subject.fetch("concept1")
+      filename = subject.filename("concept1")
+p filename
       File.exists?(filename).should == true
       File.open(filename).read.should == CONCEPT1
-      File.unlink(filename)
     end
 
     it "fetching invalid Concept XML should raise Gcmd::Exception" do
@@ -195,17 +187,16 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     it "should save and return true" do
       data = "#{object_id}"
       subject.save("concept1", data).should == true
+      File.unlink("concept1")
     end
 
     it "should not save if already existing" do
       data = "#{object_id}"
       subject.save("concept1", data)
       subject.save("concept1", data).should == true
+      File.unlink("concept1")
     end
 
-    it "should prepend cache if missing in filename"
-    # the tests above leave stray concept1 files
-  
   end
 
   context "#addConcept" do

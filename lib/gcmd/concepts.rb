@@ -5,6 +5,7 @@ require "logger"
 
 module Gcmd
   class Concepts
+
     # http://gcmdservices.gsfc.nasa.gov/kms/concept_versions/all
     #<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     #<versions xsi:noNamespaceSchemaLocation="http://gcmd.nasa.gov/kms/gcmd.xsd">
@@ -14,7 +15,7 @@ module Gcmd
     #</versions>
     VERSION = "7.0"
 
-    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= File.join(File.dirname(__FILE__)+"/_concepts")
+    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= ENV["HOME"] + "/.gcmd_concepts"
 
     BASE = Http::BASE + "/kms/concepts/"
 
@@ -29,7 +30,9 @@ module Gcmd
       "isotopiccategory", "rucontenttype", "horizontalresolutionrange",
       "verticalresolutionrange", "temporalresolutionrange"].sort
 
-    attr_accessor :base, :cache, :http, :log
+    # SHA1-log
+
+    attr_accessor :base, :cache, :version, :http, :log
 
     def self.schemas(root=false)
       if root or "root" == root
@@ -58,7 +61,7 @@ module Gcmd
       @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
       @version = version
       unless false == cache
-        add_concepts_from_cache
+        add_rdf_xml_concepts_from_disk_cache
       end
       @ng_concept_cache = {}
     end
@@ -78,8 +81,8 @@ module Gcmd
       @concept[scheme] = xml
     end
 
-    def add_concepts_from_cache
-      (["root"]+self.class.schemas).each do |scheme|
+    def add_rdf_xml_concepts_from_disk_cache
+      schemas(true).each do |scheme|
         filename = File.join(cache, version, scheme)
           if File.exists? filename
             addConcept(scheme, filename)
@@ -87,45 +90,62 @@ module Gcmd
       end
     end
 
-    def collection(schema)
+    def filename(schema)
+      filename = File.join(cache, version, schema)
+    end
 
-      collection = ng(schema).xpath("//skos:Concept").map {|concept|
+    # Creates an array of object hashes with the following keys:
+    #   :id, :label, :title, :summary, :child_ids, :edit_comment, :collection, :concept, :workspace, :version,
+    #   :lang, :tree, :children, :ancestors, :ancestor_ids
+    # See executable in "bin/gcmd_concepts_to_json"
+    def hashify(schema)
+
+      collection = ng(schema).xpath("//skos:Concept")      
+      log.debug("#hashify(#{schema}) (#{collection.size})")
+      # Loop all concepts and create a Hash of each, then re-loop to add ancestors and children
+      # The second loop takes advantage of a temporary object cache
+      collection.map {|concept|
         
         id = concept.xpath("@rdf:about").text
 
+        # Store nokogiri concept in object cache
         @ng_concept_cache[id] = concept
 
         summary = concept.xpath("skos:definition[@xml:lang='en']").text
         title = concept.xpath("skos:prefLabel[@xml:lang='en']").text
         broader_id = concept.xpath("skos:broader/@rdf:resource").text
         broader_id = broader_id == "" ? nil : broader_id        
-        narrower_ids = concept.xpath("skos:narrower/@rdf:resource").map {|n| n.to_s }
-        changeNote = concept.xpath("skos:changeNote").text
+        child_ids = concept.xpath("skos:narrower/@rdf:resource").map {|n| n.to_s }
+        edit_comment = concept.xpath("skos:changeNote").text
 
         if broader_id.nil?
           tree = :root
-        elsif narrower_ids.any?
+        elsif child_ids.any?
           tree = :branch
         else
           tree = :leaf
         end
+
+        i = 0
         {
           :id => id,
           :label => title,
           :title => title,
           :summary => summary,
           :broader_id => broader_id,
-          :narrower_ids => narrower_ids,
-          :changeNote => changeNote,
-          :collection => schema,
+          :child_ids => child_ids,
+          :edit_comment => edit_comment,
+          :concept => schema,
+          :collection => :concept,
           :workspace => :gcmd,
           :version => version,
           :lang => :en,
           :tree => tree
         }
       }.map do | c |
-        
-        c[:narrower] = c[:narrower_ids].map {|id|
+        log.debug("#hashify(#{schema}) [#{c[:label]}]")
+
+        c[:children] = c[:child_ids].map {|id|
           @ng_concept_cache[id].xpath("skos:prefLabel[@xml:lang='en']").text
         }
         if c[:broader_id].nil?
@@ -144,6 +164,10 @@ module Gcmd
         c.delete :broader_id
         c
       end
+    end
+
+    def cache
+      @cache ||= CACHE
     end
 
     def concept(scheme)
@@ -211,6 +235,7 @@ module Gcmd
       narrower("root").sort
     end
 
+    # See executable in "bin/gcmd_fetch_concepts"
     def fetch_all
 
       log.debug "Fetching all GCMD Concepts (RDF XML) to #{cache}"
@@ -232,8 +257,9 @@ module Gcmd
       if uri.nil?
         uri = base+scheme+"?format=rdf"
       end
+
       log.debug "#{self.class.name}#fetch #{uri}"
-      
+
       xml = get(uri)
 
       if self.class.valid? xml
@@ -243,10 +269,8 @@ module Gcmd
         addConcept(scheme, xml)
   
         version = keywordVersion(scheme) 
-  
-        filename = File.join(cache, version, scheme)
-        
-        status = save(filename, xml)
+          
+        status = save(filename(scheme), xml)
         
       else
         log.error("Invalid #{scheme} XML from #{uri}:\n#{xml}")
@@ -257,6 +281,7 @@ module Gcmd
     end
 
     def save(filename, data)
+
       dir = File.dirname(filename)
       unless File.exists? dir
         FileUtils.mkpath dir
@@ -303,6 +328,8 @@ module Gcmd
 
     protected
 
+    # Lookup ancestors recursively
+    # See #collection for use
     def recursive_ancestors(schema, broader_id, ancestors = [], ids = [])
       parent = @ng_concept_cache[broader_id].xpath("skos:broader/@rdf:resource").text      
       if parent.size > 0

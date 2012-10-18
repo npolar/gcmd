@@ -5,13 +5,16 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "gcmd"
-  s.version     = "0.2.0"
+  s.version     = "0.3.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Conrad Helgeland", "Ruben Dens"]
   s.email       = [""]
   s.homepage    = "http://github.com/npolar/gcmd"
   s.summary     = "Ruby GCMD libray"
-  s.description = "Ruby library for working with GCMD services and data, in particular DIF XML"
+  s.description = "Ruby library for working with GCMD services and data, contains\n
+* DIF XML parser and builder\n
+* HTTP client\n
+* skos:Concept parser\n"
   
   s.add_development_dependency "rspec", "~> 2.0"
 

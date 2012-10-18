@@ -3,7 +3,7 @@
 # Fetches GCMD Concepts (RDF XML) to a local disk cache
 #
 # Usage:
-#   $ ~/github.com/gcmd$ ./bin/gcmd_fetch_concepts [username] [password] [cache]
+#   $ ~/github.com/gcmd$ ./bin/gcmd_fetch_concepts [username] [password]
 #
 require "bundler/setup"
 require_relative "./../lib/gcmd"
@@ -14,6 +14,9 @@ begin
 
   # Change cache location
   # concepts.cache = "/tmp/gcmd-concepts-cache"
+
+  # The library will use ENV["GCMD_CONCEPTS_CACHE"] if set, otherwise the
+  # default cache is ~/.gcmd_concepts/ with a subfolder for each version
 
   # Change log (default is STDERR)
   # log = Logger.new("/dev/null")
@@ -26,7 +29,7 @@ begin
   all = concepts.fetch_all
 
   status = ((all.size - 1) == Gcmd::Concepts.schemas.size) ? 0 : 1
-
+  
   exit(status)
 
 rescue => e

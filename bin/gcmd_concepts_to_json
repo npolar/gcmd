@@ -1,12 +1,41 @@
 #!/usr/bin/env ruby
+#
+# Converts GCMD Concepts (RDF XML) to JSON
+#
+# Outputs a JSON array on STDOUT, consisting of objects with the following keys:
+#   "id", "label", "title", "summary", "child_ids", "edit_comment", "collection", "concept", "workspace", "version",
+#   "lang", "tree", "children", "ancestors", "ancestor_ids"
+#
+# Usage examples
+#   $ ~/github.com/gcmd$ ./bin/gcmd_concepts_to_json > ~/.gcmd_concepts/7.0/gcmd_concepts.json
+#   $ ~/github.com/gcmd$ ./bin/gcmd_concepts_to_json idnnode > ~/.gcmd_concepts/7.0/gcmd_idnnode.json
 require "bundler/setup"
 require "yajl/json_gem"
 require_relative "./../lib/gcmd"
 
-concepts = Gcmd::Concepts.new
-docs = []
+begin
 
-Gcmd::Concepts.schemas.each do |schema|
-  docs += concepts.collection(schema) 
+  concepts = Gcmd::Concepts.new
+  docs = []
+
+  if ARGV[0] =~ /\w+/
+    if Gcmd::Concepts.schemas.include? ARGV[0]
+      schemas = [ARGV[0]]
+    else
+      puts "Usage:\n"+__FILE__+" ["+ Gcmd::Concepts.schemas.join(" | ")+"]\n"
+      exit(1)
+    end
+  else
+    schemas = Gcmd::Concepts.schemas
+  end
+
+  schemas.each do |schema|
+    docs += concepts.hashify(schema) 
+  end
+  puts docs.to_json
+  exit(0)
+
+rescue => e
+  raise e
+  exit(1)
 end
-puts docs.to_json
