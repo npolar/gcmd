@@ -15,7 +15,7 @@ module Gcmd
     #</versions>
     VERSION = "7.0"
 
-    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= ENV["HOME"] + "/.gcmd_concepts"
+    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= ENV["HOME"] + "/.gcmd/concepts"
 
     BASE = Http::BASE + "/kms/concepts/"
 
@@ -96,7 +96,7 @@ module Gcmd
 
     # Creates an array of object hashes with the following keys:
     #   :id, :label, :title, :summary, :child_ids, :edit_comment, :collection, :concept, :workspace, :version,
-    #   :lang, :tree, :children, :ancestors, :ancestor_ids
+    #   :lang, :tree, :cardinality, :children, :ancestors, :ancestor_ids
     # See executable in "bin/gcmd_concepts_to_json"
     def hashify(schema)
 
@@ -159,7 +159,11 @@ module Gcmd
           c[:ancestor_ids] = [c[:broader_id]] + ancestors[:ids]
 
           c[:title] = c[:title] +" ("+ c[:ancestors].reverse.join(" > ") +")"
+        
         end
+
+        c[:cardinality] = c[:ancestors].size
+
         c.delete :broader
         c.delete :broader_id
         c

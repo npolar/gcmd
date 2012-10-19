@@ -44,7 +44,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
         :title=>"GTR (Instruments > In Situ/Laboratory Instruments > Recorders/Loggers)", :summary=>"",
         :child_ids=>[], :edit_comment =>"", :collection => :concept, :concept=>"instruments", :workspace=>:gcmd, :version=>"7.0",
         :lang=>:en, :tree=>:leaf, :children=>[],
-        :ancestors=>["Recorders/Loggers", "In Situ/Laboratory Instruments", "Instruments"],
+        :ancestors=>["Recorders/Loggers", "In Situ/Laboratory Instruments", "Instruments"], :cardinality => 3,
         :ancestor_ids=>["ebfff02c-2e5a-476e-aafb-c00167bf2daa", "ff564c87-78f2-47eb-a857-a4bdc0a71ae5", "b2140059-b3ca-415c-b0a7-3e142783ffe8"]
       }
 
@@ -157,9 +157,9 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
     it "should save Concept XML to disk cache" do
       subject.fetch("concept1")
       filename = subject.filename("concept1")
-p filename
       File.exists?(filename).should == true
       File.open(filename).read.should == CONCEPT1
+      File.unlink(filename).should == 1
     end
 
     it "fetching invalid Concept XML should raise Gcmd::Exception" do
@@ -170,7 +170,7 @@ p filename
   end
 
   it "#fetch_all should call fetch for all schemas + root" do
-    (subject.class.schemas+["root"]).each do | schema |      
+    subject.class.schemas("root").each do | schema |      
       subject.should_receive(:fetch).with(schema)      
     end
     subject.fetch_all
@@ -187,14 +187,14 @@ p filename
     it "should save and return true" do
       data = "#{object_id}"
       subject.save("concept1", data).should == true
-      File.unlink("concept1")
+      File.unlink("concept1").should == 1
     end
 
     it "should not save if already existing" do
       data = "#{object_id}"
       subject.save("concept1", data)
       subject.save("concept1", data).should == true
-      File.unlink("concept1")
+      File.unlink("concept1").should == 1
     end
 
   end
