@@ -22,7 +22,7 @@ particular the [Directory Interchange Format](http://gcmd.nasa.gov/User/difguide
 * Ruby >= 1.9.3
 
 ## About
-This library is developed by the Datacenter staff at the Norwegian Polar Institute(http://npolar.no/).
+All https://github.com/npolar code is maintained by staff at the [Data Centre](http://data.npolar.no/) of the [Norwegian Polar Institute](http://npolar.no/).
 
 ### Credits
 
