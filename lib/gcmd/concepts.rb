@@ -146,7 +146,12 @@ module Gcmd
         log.debug("#hashify(#{schema}) [#{c[:label]}]")
 
         c[:children] = c[:child_ids].map {|id|
-          @ng_concept_cache[id].xpath("skos:prefLabel[@xml:lang='en']").text
+          if @ng_concept_cache.key? id
+            @ng_concept_cache[id].xpath("skos:prefLabel[@xml:lang='en']").text
+          else
+            log.warn("Missing concept: #{id} in #{c[:concept]}")
+            nil
+          end
         }
         if c[:broader_id].nil?
           c[:ancestors] = []
