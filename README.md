@@ -7,8 +7,8 @@ GCMD's Keyword Management System.
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/npolar/gcmd)
 
 ## Features
-* DIF XML parsing (to Ruby Hash)
-* DIF XML writing (from Ruby Hash)
+* [DIF XML parsing](https://github.com/npolar/gcmd/wiki/DIF) (to Ruby Hash)
+* [DIF XML](https://github.com/npolar/gcmd/wiki/DIF) writing (from Ruby Hash)
 * Bullet- and futureproof XML handling by direct use of DIF's XML Schema
 * HTTP client for GCMD's new KMS (Keyword Management System) service
 * Keyword parser (from skos:Concept XML to Ruby Array)
