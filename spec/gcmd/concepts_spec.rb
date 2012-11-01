@@ -39,7 +39,7 @@ xmlns:skos="http://www.w3.org/2004/02/skos/core#"><gcmd:keywordVersion xmlns:gcm
   end
 
   context "#hashify" do
-    it "Array of Atomic hashes" do
+    it "Array of hashes" do
       subject.hashify("instruments")[77].should == {:id=>"00c994a8-64eb-4263-a3fa-85fd902bb91b", :label=>"GTR",
         :title=>"GTR (Instruments > In Situ/Laboratory Instruments > Recorders/Loggers)", :summary=>"",
         :child_ids=>[], :edit_comment =>"", :collection => :concept, :concept=>"instruments", :workspace=>:gcmd, :version=>"7.0",

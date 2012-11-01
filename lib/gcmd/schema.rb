@@ -29,9 +29,8 @@ module Gcmd
     
     VERSION = "9.8.3"
     
-    # Default DIF schema (DIF version 9.8.3)
-    XSD = File.dirname(__FILE__) + "/../../data/dif.xsd"
-    
+    # Default DIF XML schema, by default in ~/.gcmd/dif/dif.xsd
+    XSD = Gcmd::CACHE + "/dif/dif.xsd"
     attr_accessor :info, :unbounded, :location
     
     def initialize( xml_schema = XSD )

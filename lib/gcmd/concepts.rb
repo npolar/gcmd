@@ -15,7 +15,7 @@ module Gcmd
     #</versions>
     VERSION = "7.0"
 
-    CACHE = ENV["GCMD_CONCEPTS_CACHE"] ||= ENV["HOME"] + "/.gcmd/concepts"
+    CACHE = Gcmd::CACHE + "/concepts"
 
     BASE = Http::BASE + "/kms/concepts/"
 

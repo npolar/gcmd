@@ -1,6 +1,7 @@
 require "simplecov"
 require "rspec"
 require "faraday"
+require "gcmd"
 
 SimpleCov.start do
   add_filter "/spec/"

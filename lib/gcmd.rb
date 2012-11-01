@@ -1,4 +1,5 @@
 module Gcmd
+  CACHE = ENV["GCMD_CACHE"] ||= ENV["HOME"] + "/.gcmd"
 end
 
 require_relative "gcmd/exception"

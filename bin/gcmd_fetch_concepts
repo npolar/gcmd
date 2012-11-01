@@ -15,8 +15,8 @@ begin
   # Change cache location
   # concepts.cache = "/tmp/gcmd-concepts-cache"
 
-  # The library will use ENV["GCMD_CONCEPTS_CACHE"] if set, otherwise the
-  # default cache is ~/.gcmd_concepts/ with a subfolder for each version
+  # The library will use ENV["GCMD_CACHE"] if set, otherwise the
+  # default cache is ~/.gcmd/concepts/{version}
 
   # Change log (default is STDERR)
   # log = Logger.new("/dev/null")
