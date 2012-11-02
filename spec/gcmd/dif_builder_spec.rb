@@ -34,7 +34,7 @@ describe Gcmd::DifBuilder do
       end
       
       it "should provide a complete DIF representation including fields not in the input" do        
-        subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should include( "<Personnel>", "<ISO_Topic_Category>", "<Paleo_Temporal_Coverage>" )
+        subject.build_dif( {"Entry_ID" => "Enter-the-ID"} ).should match( /(.*)<Paleo_Temporal_Coverage(\/)?>(.*)/ )
       end
       
     end
