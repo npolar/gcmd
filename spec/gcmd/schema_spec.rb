@@ -180,7 +180,7 @@ describe Gcmd::Schema do
       context "#schema_location" do
         
         it "should return a link to the schema used for validation" do
-          subject.schema_location.should == "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.3.xsd"
+          subject.schema_location.should =~ /http:\/\/gcmd.gsfc.nasa.gov\/Aboutus\/xml\/dif\/dif_v(.*).xsd/
         end
         
       end
