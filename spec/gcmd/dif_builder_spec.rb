@@ -199,11 +199,7 @@ describe Gcmd::DifBuilder do
       end
       
       it "should include the keys defined in the schema" do
-        subject.xml_template.should include("<Personnel>", "<Role>", "<Distribution_Size>")
-      end
-      
-      it "should have no data for the elements" do
-        subject.xml_template.should include("<Role></Role>")
+        subject.schema.validate_xml( subject.xml_template ).any?.should == false
       end
       
     end
