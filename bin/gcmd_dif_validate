@@ -1,0 +1,4 @@
+#!/bin/sh
+
+DIF_CACHE="$GCMD_CACHE/dif"
+DIF_FILENAME="$DIF_CACHE/dif.xsd"

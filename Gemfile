@@ -6,6 +6,7 @@ gem "nokogiri"
 gem "rack-cache"
 gem "uuidtools"
 gem "yajl-ruby" # https://github.com/brianmario/yajl-ruby
+gem "hashie"
 
 ## Documentation
 gem "yard"

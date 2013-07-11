@@ -1,0 +1,114 @@
+{
+	"type":"object",
+	"$schema": "http://json-schema.org/draft-03/schema",
+	"id": "#",
+	"required":false,
+	"properties":{
+		"_id": {
+			"type":"string",
+			"id": "_id",
+			"required":false
+		},
+		"_rev": {
+			"type":"string",
+			"id": "_rev",
+			"required":false
+		},
+		"ancestor_ids": {
+			"type":"array",
+			"id": "ancestor_ids",
+			"required":false,
+			"items":
+				{
+					"type":"string",
+					"id": "0",
+					"required":false
+				}
+			
+
+		},
+		"ancestors": {
+			"type":"array",
+			"id": "ancestors",
+			"required":false,
+			"items":
+				{
+					"type":"string",
+					"id": "0",
+					"required":false
+				}
+			
+
+		},
+		"cardinality": {
+			"type":"number",
+			"id": "cardinality",
+			"required":false
+		},
+		"child_ids": {
+			"type":"array",
+			"id": "child_ids",
+			"required":false
+		},
+		"children": {
+			"type":"array",
+			"id": "children",
+			"required":false
+		},
+		"collection": {
+			"type":"string",
+			"id": "collection",
+			"required":false
+		},
+		"concept": {
+			"type":"string",
+			"id": "concept",
+			"required":false
+		},
+		"edit_comment": {
+			"type":"string",
+			"id": "edit_comment",
+			"required":false
+		},
+		"id": {
+			"type":"string",
+			"id": "id",
+			"required":false
+		},
+		"label": {
+			"type":"string",
+			"id": "label",
+			"required":false
+		},
+		"lang": {
+			"type":"string",
+			"id": "lang",
+			"required":false
+		},
+		"summary": {
+			"type":"string",
+			"id": "summary",
+			"required":false
+		},
+		"title": {
+			"type":"string",
+			"id": "title",
+			"required":false
+		},
+		"tree": {
+			"type":"string",
+			"id": "tree",
+			"required":false
+		},
+		"version": {
+			"type":"string",
+			"id": "version",
+			"required":false
+		},
+		"workspace": {
+			"type":"string",
+			"id": "workspace",
+			"required":false
+		}
+	}
+}

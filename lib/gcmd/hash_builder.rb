@@ -15,7 +15,7 @@ module Gcmd
   # @author Ruben Dens
   # @author Conrad Helgeland
   
-  class HashBuilder < Gcmd::Tools
+  class DeprecatedHashBuilder < Gcmd::Tools
     
     NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
     
@@ -25,8 +25,8 @@ module Gcmd
     
     attr_accessor :document, :schema
     
-    def initialize( dif_xml=nil )
-      self.schema = Gcmd::Schema.new
+    def initialize( dif_xml=nil, schema=Gcmd::Schema.new)
+      self.schema = schema
       self.document = load_xml( dif_xml ) unless dif_xml.nil?
     end
    

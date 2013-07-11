@@ -1,10 +1,14 @@
 #!/usr/bin/env ruby
 #
-# Converts GCMD Concepts (RDF XML) to JSON
+# Converts GCMD Concepts in (RDF XML) to JSON
 #
-# Outputs a JSON array on STDOUT, consisting of objects with the following keys:
-#   "id", "label", "title", "summary", "child_ids", "edit_comment", "collection", "concept", "workspace", "version",
-#   "lang", "tree", "children", "ancestors", "ancestor_ids"
+# Outputs a JSON array on STDOUT, consisting of objects like 
+#  {"id":"a9f88ca9-5d19-45fa-8fbb-3c6ff5f1f190","label":"Chronostratigraphic Units",
+#    "title":"Chronostratigraphic Units","summary":"",
+#    "child_ids":["7160e90a-d7c4-4817-9b1c-e82211688bdb","af145656-986a-4969-bb77-6e5b2cff1ede","c7626c29-a1d3-4d0c-a263-616fe060f164","4407ca3c-3dc0-402c-bfc3-4dabd23f283a"],
+#    "edit_comment":"","concept":"chronounits",
+#    "collection":"concept","workspace":"gcmd","version":"7.0","lang":"en","tree":"root",
+#    "children":["ARCHAEAN","PHANEROZOIC","HADEAN","PROTEROZOIC"],"ancestors":[],"cardinality":0}
 #
 # Usage examples
 #   $ ~/github.com/gcmd$ ./bin/gcmd_concepts_to_json > ~/.gcmd_concepts/7.0/gcmd_concepts.json

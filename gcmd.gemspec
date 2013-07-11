@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "gcmd"
-  s.version     = "0.3.1"
+  s.version     = "0.3.2"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Conrad Helgeland", "Ruben Dens"]
   s.email       = ["data*npolar.no"]

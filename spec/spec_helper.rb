@@ -10,6 +10,6 @@ ENV.delete "GCMD_HTTP_PASSWORD"
 ENV.delete "GCMD_HTTP_USERNAME"
 
 # Flag test enviroment with ENV["GCMD_ENV"] = "test" to disable logging
-# ENV["GCMD_ENV"] = "test"
+ENV["GCMD_ENV"] = "test"
 
 ::Faraday.default_adapter = :test

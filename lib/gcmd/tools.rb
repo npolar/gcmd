@@ -25,16 +25,20 @@ module Gcmd
 
     def load_xml( source, uri = false )
       begin
-        
-        if uri or source =~ /^http(s)?\:\/\//
-          Nokogiri::XML::Document.parse( open( source ).read, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
-        else
-          source = File.read( source ) if File.exists? source
-          Nokogiri::XML::Document.parse( source, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
+        #if source =~ /^http(s)?\:\/\//
+          #Nokogiri::XML::Document.parse( open( source ).read, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
+        #else
+
+        if /^\<\?xml/ =~ source
+          # noop
+        elsif File.exists? source
+          source = File.read( source )
         end
+          Nokogiri::XML::Document.parse( source, nil, nil, Nokogiri::XML::ParseOptions::NOBLANKS )
+        #end
         
       rescue => e
-        raise ArgumentError, "Invalid Source: " + e.message
+        raise ArgumentError, "Invalid Source: " + e.message[0..255]
       end
     end
     

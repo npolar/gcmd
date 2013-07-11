@@ -4,10 +4,10 @@ require "gcmd/hash_builder"
 require "nokogiri"
 require "json"
 
-describe Gcmd::HashBuilder do
+describe Gcmd::Dif do
   
   subject do
-    Gcmd::HashBuilder.new( "spec/data/dif_record.xml" )
+    Gcmd::Dif.new( "spec/data/dif_record.xml" )
   end
   
   context "Importing XML" do
