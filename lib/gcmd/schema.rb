@@ -27,7 +27,7 @@ module Gcmd
     
     XPATH = "//dif:DIF"
     
-    VERSION = "9.8.3"
+    VERSION = "9.8.4"
     
     # Default DIF XML schema, by default in ~/.gcmd/dif/dif.xsd
     XSD = Gcmd::CACHE + "/dif/dif.xsd"
