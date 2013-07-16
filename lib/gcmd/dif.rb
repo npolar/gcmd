@@ -55,7 +55,6 @@ module Gcmd
         
       a
     end
-    
 
     # *Recursive* method that turns an XML tree into a Hash
     # Unbounded elements are always represented as Arrays
@@ -77,7 +76,7 @@ module Gcmd
             if result[ node.name ].is_a?( Array )
               result[ node.name ] << node.content
             else
-              result[ node.name ] = node.to_s #content
+              result[ node.name ] = content
             end
           end
 
@@ -90,6 +89,7 @@ module Gcmd
     def document_to_hash
       document_to_array.first
     end
+    
     
     # Loads DIF XML from source (path/filename, XML string, URI)
     # Loadings sets a Nokogiri XML Document, converts it to an Hash,
