@@ -76,7 +76,7 @@ module Gcmd
             if result[ node.name ].is_a?( Array )
               result[ node.name ] << node.content
             else
-              result[ node.name ] = content
+              result[ node.name ] = node.content
             end
           end
 
