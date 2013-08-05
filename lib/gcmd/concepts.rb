@@ -13,7 +13,7 @@ module Gcmd
     #    <version id="5" creation_date="2012-10-09" type="DRAFT">draft</version>
     #    <version id="1" creation_date="2012-06-12" type="PAST_PUBLISHED">Jun122012</version>
     #</versions>
-    VERSION = "7.0"
+    VERSION = "8.0"
 
     CACHE = Gcmd::CACHE + "/concepts"
 
