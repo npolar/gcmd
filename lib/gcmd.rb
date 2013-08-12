@@ -1,5 +1,9 @@
 module Gcmd
-  CACHE = ENV["GCMD_CACHE"] ||= ENV["HOME"] + "/.gcmd"
+  if ENV.key? "GCMD_CACHE"
+    CACHE = ENV["GCMD_CACHE"]
+  else
+    CACHE = Dir.tmpdir+"/gcmd-cache"
+  end
 end
 
 require_relative "gcmd/exception"
