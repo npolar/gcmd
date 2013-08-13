@@ -1,3 +1,4 @@
+require "tmpdir"
 module Gcmd
   if ENV.key? "GCMD_CACHE"
     CACHE = ENV["GCMD_CACHE"]
