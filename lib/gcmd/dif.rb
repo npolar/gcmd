@@ -22,7 +22,7 @@ module Gcmd
     
     DIF_XPATH = "//dif:DIF"
     
-    EXCLUDED = ["Contact_Address", "Fax", "Phone"]
+    EXCLUDED = ["Fax", "Phone"]
     
     attr_accessor :document, :schema, :excluded
     
@@ -67,16 +67,23 @@ module Gcmd
           result[ node.name ] = [] if unbounded?( node.name ) && result[ node.name ].nil?
 
           if node.children.children.any?
+
             if result[ node.name ].is_a?( Array )
+              # Add children, @todo except those that are whitespace
               result[ node.name ] << hash_from_xml( node.children )
             else
               result[ node.name ] = hash_from_xml( node.children )
             end
           else
+
+            #p "[n]"+node.name
             if result[ node.name ].is_a?( Array )
+              #p "(array)"+node.content
               result[ node.name ] << node.content
             else
-              result[ node.name ] = node.content
+              if node.name != "text" and node.content !~ /^\s+$/
+                result[ node.name ] = node.content
+              end
             end
           end
 
@@ -136,8 +143,8 @@ module Gcmd
     end
 
     def to_xml
-      builder = Gcmd::DifBuilder.new
-      builder.build_xml(self)
+      builder = Gcmd::DifBuilder.new(self)
+      builder.build_dif
     end
 
     protected

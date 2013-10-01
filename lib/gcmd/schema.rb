@@ -21,7 +21,7 @@ module Gcmd
   # @author Ruben Dens
   # @author Conrad Helgeland
 
-  class Schema < Gcmd::Tools
+  class Schema
     
     NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
     
@@ -44,8 +44,21 @@ module Gcmd
       @schema
     end
     
-    def schema=xml_schema
-      @schema = load_xml( xml_schema )
+    def schema=schema
+
+      begin
+        if schema.is_a? Nokogiri::XML::Document
+          @schema = schema
+        else
+          if schema.size < 255 and File.exists? schema
+            schema = File.read schema
+          end
+          @schema = Nokogiri::XML::Document.parse( schema, nil, nil ) #, Nokogiri::XML::ParseOptions::NOBLANKS
+        end
+        
+       rescue => e
+        raise ArgumentError, "Invalid XML source: " + e.message[0..255]
+      end
     end
     
     # This is a recursive method that walks the XML structure.
@@ -141,7 +154,7 @@ module Gcmd
         errors << {
           "Entry_Title" => node.xpath(".//dif:Entry_Title", NAMESPACE).first.text,
           "Entry_ID" => node.xpath(".//dif:Entry_ID", NAMESPACE).first.text,
-          "details" => errs
+          "details" => errs.map{|e| e.message.gsub(/\{http:\/\/gcmd.gsfc.nasa.gov\/Aboutus\/xml\/dif\/\}/, "")}
         } if errs.any?
         
       end

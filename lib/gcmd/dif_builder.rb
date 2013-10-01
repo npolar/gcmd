@@ -37,7 +37,8 @@ module Gcmd
     
     def build_dif( dif_hash = data_hash )
       unless dif_hash.nil?
-        dif_hash = sync_with_template( dif_hash, hash_template )
+        #dif_hash = sync_with_template( dif_hash, hash_template )
+        # screws dta set citation
         build_xml( dif_hash )
       else
         raise ArgumentError, "No data provided"
@@ -57,6 +58,8 @@ module Gcmd
           xml.DIF(:xmlns => NAMESPACE,
             "xsi:schemaLocation" => schema.schema_location,
             "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {
+              # loop xml schema
+
             build_from_hash( xml, data_hash )
           }
           
@@ -74,10 +77,9 @@ module Gcmd
     # @see #build_from_array
     
     def build_from_hash( xml_builder, hash )
-      
+      # Loop XML schema for element key to get its child  sequence
       hash.each do | key, value |
-        
-        if value.is_a? String
+        if value.is_a? String or value.is_a? Float or value.is_a? Integer
           xml_builder.send( key, value )
         elsif value.is_a? Hash
           xml_builder.send( key ) { build_from_hash( xml_builder, value ) }
@@ -126,7 +128,7 @@ module Gcmd
         
         template.each do | key, value |
           unless hash[key].nil?          
-            if hash[key].is_a? String
+            if hash[key].is_a? String or hash[key].is_a? Float or hash[key].is_a? Integer
               completed[key] = hash[key]
             elsif hash[key].is_a? Hash
               completed[key] = sync_with_template( hash[key], value )
@@ -156,7 +158,7 @@ module Gcmd
       
       if array.any?
         array.each do | item |
-          if item.is_a? String
+          if item.is_a? String or item.is_a? Float or item.is_a? Integer
             data << item
           elsif item.is_a? Hash
             data << sync_with_template( item, template )
@@ -174,6 +176,10 @@ module Gcmd
     
     def xml_template
       build_xml( hash_template )
+    end
+
+    def build_from_schema(d)
+      
     end
     
   end  
