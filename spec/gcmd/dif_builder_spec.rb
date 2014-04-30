@@ -53,8 +53,9 @@ describe Gcmd::DifBuilder do
         expect{ subject.build_xml }.to raise_error( ArgumentError )
       end
       
-      it "should contain the DIF root element" do
-        subject.build_xml( {} ).should include( "<DIF" )
+      it "DIF element with xsi:schemaLocation =~ #{Gcmd::Schema::VERSION}" do
+        dif_elmt = "<DIF xmlns=\"http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v#{Gcmd::Schema::VERSION}.xsd\""
+        subject.build_xml( {} ).should include(dif_elmt)
       end
       
       it "should convert Hash data to xml data" do

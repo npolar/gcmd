@@ -56,7 +56,7 @@ module Gcmd
         builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do | xml |
           
           xml.DIF(:xmlns => NAMESPACE,
-            "xsi:schemaLocation" => schema.schema_location,
+            "xsi:schemaLocation" => "#{NAMESPACE} #{schema.schema_location}",
             "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") {
               # loop xml schema
 
