@@ -19,7 +19,7 @@ module Gcmd
       @base = base
       @opts = OPTS.merge(opts)
       @client = connection(&builder)
-      @log = ENV["GCMD_ENV"] =="test" ? Logger.new("/dev/null") : Logger.new(STDERR)
+      @log = ENV["GCMD_ENV"] == "test" ? Logger.new("/dev/null") : Logger.new(STDERR)
     end
 
     def base
@@ -55,7 +55,12 @@ module Gcmd
       end
       @response.body
     end
-
+    
+     def head(uri)      
+      @client.basic_auth username, password
+      @response = @client.head(uri)
+    end
+    
     def host
       @client.host
     end

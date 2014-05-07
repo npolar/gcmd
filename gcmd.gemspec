@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "gcmd"
-  s.version     = "0.4.0"
+  s.version     = "0.5.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Conrad Helgeland", "Ruben Dens"]
   s.email       = ["data*npolar.no"]
@@ -24,4 +24,3 @@ Gem::Specification.new do |s|
   s.test_files         = `git ls-files -- {test,spec}/*`.split("\n")
   s.require_paths      = ["lib"]
 end
-

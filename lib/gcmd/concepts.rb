@@ -1,6 +1,7 @@
 require "nokogiri"
 require "fileutils"
 require "digest/sha1"
+require "digest/md5"
 require "logger"
 
 module Gcmd
@@ -253,27 +254,45 @@ module Gcmd
       version = VERSION
       (["root"]+schemas).each do | scheme |
         log.debug "#{self.class.name}#fetch_all [#{scheme}]"
-        f << fetch(scheme)
+        
+        existing_md5 = ""
+        if File.exists? filename(scheme)
+          existing_md5 = Digest::MD5.hexdigest File.read(filename(scheme))
+          log.debug "MD5: #{existing_md5} existing file: #{filename(scheme)}"
+        end
+        
+        uri = scheme_uri(scheme)
+        
+        http.head(uri)
+        remote_md5 = http.response.headers["content-md5"]
+        
+        if remote_md5 != existing_md5
+          log.info "#{self.class.name}#fetch #{uri}"  
+          f << fetch(scheme)
+        else
+          log.debug "Not fetching #{uri}, MD5 matches existing file #{filename(scheme)}"
+        end
+        
+      
       end
       log.debug "Finished #fetch_all"
       f
     end
+    
+    
+    def scheme_uri(scheme, format="rdf")
+      base = scheme != "root" ? BASE+"concept_scheme/" : BASE
+      base+scheme+"?format=#{format}"
+    end
 
     def fetch(scheme, uri=nil)
-
-      base = scheme != "root" ? BASE+"concept_scheme/" : BASE
-
       if uri.nil?
-        uri = base+scheme+"?format=rdf"
+        uri = scheme_uri(scheme)
       end
-
-      log.debug "#{self.class.name}#fetch #{uri}"
 
       xml = get(uri)
 
       if self.class.valid? xml
-
-        # The source does not provide ETag or Last-Modified :/
         
         addConcept(scheme, xml)
   
@@ -298,7 +317,7 @@ module Gcmd
       
       if File.exists? filename
         existing_sha1 = Digest::SHA1.hexdigest File.read(filename)
-        log.debug "Existing SHA-1: #{existing_sha1}"
+        #log.debug "Existing SHA-1: #{existing_sha1}"
       end
 
       new_sha1 = Digest::SHA1.hexdigest data

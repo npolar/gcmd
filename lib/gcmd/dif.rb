@@ -1,5 +1,5 @@
 require "nokogiri"
-require "hashie/dash"
+require "hashie"
 
 module Gcmd
   
@@ -18,11 +18,13 @@ module Gcmd
   
   class Dif < ::Hashie::Dash
     
-    NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
+    NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/", "xs" => "http://www.w3.org/2001/XMLSchema" }
     
     DIF_XPATH = "//dif:DIF"
     
     EXCLUDED = ["Fax", "Phone"]
+    
+    KEYS = ["Entry_ID","Entry_Title","Data_Set_Citation","Personnel","Discipline","Parameters","ISO_Topic_Category","Keyword","Sensor_Name","Source_Name","Temporal_Coverage","Paleo_Temporal_Coverage","Data_Set_Progress","Spatial_Coverage","Location","Data_Resolution","Project","Quality","Access_Constraints","Use_Constraints","Data_Set_Language","Originating_Center","Data_Center","Distribution","Multimedia_Sample","Reference","Summary","Related_URL","Parent_DIF","IDN_Node","Originating_Metadata_Node","Metadata_Name","Metadata_Version","DIF_Creation_Date","Last_DIF_Revision_Date","DIF_Revision_History","Future_DIF_Review_Date","Private","Extended_Metadata"]
     
     attr_accessor :document, :schema, :excluded
     
@@ -30,11 +32,15 @@ module Gcmd
 
       @schema = schema
       
+      keys = schema.info.keys
+      keys = keys.none? ? KEYS : keys
+      
       # Set allowed properties from XML Schema
-      schema.info.keys.each do | key |
+      keys.each do | key |
         self.class.property key.to_sym
       end
       # FIXME (Dash also children of top level properties)
+      
       unless document.nil?
         load document
       end

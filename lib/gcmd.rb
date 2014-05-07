@@ -3,7 +3,7 @@ module Gcmd
   if ENV.key? "GCMD_CACHE"
     CACHE = ENV["GCMD_CACHE"]
   else
-    CACHE = Dir.tmpdir+"/gcmd-cache"
+    CACHE = "#{Dir.home}/.gcmd"
   end
 end
 

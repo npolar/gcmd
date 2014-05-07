@@ -23,17 +23,18 @@ module Gcmd
 
   class Schema
     
-    NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" }
+    NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/", "xs" => "http://www.w3.org/2001/XMLSchema" }
     
     XPATH = "//dif:DIF"
     
     VERSION = "9.8.4"
     
-    # Default DIF XML schema, by default in ~/.gcmd/dif/dif.xsd
+    # XSD = Path to DIF XML schema, by default in ~/.gcmd/dif/dif.xsd
     XSD = Gcmd::CACHE + "/dif/dif.xsd"
     attr_accessor :info, :unbounded, :location
     
     def initialize( xml_schema = XSD )
+      
       self.location = xml_schema
       self.schema = xml_schema
       self.info = generate_info( root )
@@ -68,7 +69,7 @@ module Gcmd
     def generate_info( node )
       information = {}
       
-      schema.xpath("//xs:element[@name='#{node}']/xs:complexType/xs:sequence/xs:element").each do | child |
+      schema.xpath("//xs:element[@name='#{node}']/xs:complexType/xs:sequence/xs:element", NAMESPACE).each do | child |
         name = child.xpath("./@ref").to_s        
         children = generate_info( name ) if has_children?( name )
         
@@ -173,7 +174,7 @@ module Gcmd
     end
     
     def has_children?( name )
-      return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType/xs:sequence").any?
+      return true if schema.xpath("//xs:element[@name='#{name}']/xs:complexType/xs:sequence", NAMESPACE).any?
       false
     end
     
@@ -201,7 +202,7 @@ module Gcmd
       # Checks all elements and if they occur as a ref.
       # If not a ref they are root elements.
       
-      schema.xpath("//xs:element[@name]").each do | element |
+      schema.xpath("//xs:element[@name]", NAMESPACE).each do | element |
         name = element.xpath("./@name").to_s
         return name unless child?( name )
       end
