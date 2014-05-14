@@ -16,7 +16,7 @@ module Gcmd
   # @author Ruben Dens
   # @author Conrad Helgeland
   
-  class Dif < ::Hashie::Dash
+  class Dif < ::Hashie::Mash
     
     NAMESPACE = { "dif" => "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/", "xs" => "http://www.w3.org/2001/XMLSchema" }
     
@@ -36,9 +36,9 @@ module Gcmd
       keys = keys.none? ? KEYS : keys
       
       # Set allowed properties from XML Schema
-      keys.each do | key |
-        self.class.property key.to_sym
-      end
+      #keys.each do | key |
+      #  self.class.property key.to_sym
+      #end
       # FIXME (Dash also children of top level properties)
       
       unless document.nil?
