@@ -141,32 +141,53 @@ module Gcmd
         end
       end
       elements
-    end    
-    
-    def validate_xml( xml = nil )
-      errors = []
-      
-      raise ArgumentError, "No XML provided!" if xml.nil?
-      xml = Nokogiri::XML::Document.parse( xml ) unless xml.is_a?( Nokogiri::XML::Document )
-      
-      xml.xpath( XPATH, NAMESPACE ).each_with_index do | node, index |
-        errs = nokogiri_schema.validate( Nokogiri::XML::Document.parse( node.to_s ) )
-        
-        errors << {
-          "Entry_Title" => node.xpath(".//dif:Entry_Title", NAMESPACE).first.text,
-          "Entry_ID" => node.xpath(".//dif:Entry_ID", NAMESPACE).first.text,
-          "details" => errs.map{|e| e.message.gsub(/\{http:\/\/gcmd.gsfc.nasa.gov\/Aboutus\/xml\/dif\/\}/, "")}
-        } if errs.any?
-        
-      end
-      
-      errors
     end
     
     def schema_location
       "#{NAMESPACE['dif']}dif_v#{VERSION}.xsd"
     end
+        
+    def validate_xml( xml = nil )
+      errors = []
+      if xml.nil?
+        raise ArgumentError, "Cannot validate nothing"
+      end
+      unless xml.is_a?( Nokogiri::XML::Document )
+        xml = Nokogiri::XML::Document.parse( xml ) 
+      end
+      r = xml.xpath( XPATH, NAMESPACE )
+
+      r.each_with_index do | node, index |
+        
+        errs = nokogiri_schema.validate( Nokogiri::XML::Document.parse( node.to_s ) )
+        
+        errs += validate_providers(node)  
+        
+        if errs.any?
+          
+          r = node.xpath(".//dif:Entry_ID", NAMESPACE)
+          entry_id = r.any? ? r.first.text : ""
+          
+          r = node.xpath(".//dif:Entry_Title", NAMESPACE)
+          entry_title = r.any? ? r.first.text : ""
+          
+          errors << {
+            "Entry_ID" => entry_id,
+            "Entry_Title" => entry_title,
+            "errors" => errs.map {|e| e.message}
+          }
+        end
+        
+      end
+      
+      errors
+    end
+    alias :validate :validate_xml
     
+    def providers
+      @@providers ||= Gcmd::Concepts.new.providers.map {|p| p[1]}
+    end
+        
     protected
     
     def nokogiri_schema
@@ -206,6 +227,19 @@ module Gcmd
         name = element.xpath("./@name").to_s
         return name unless child?( name )
       end
+    end
+    
+    def validate_providers(node)
+      results = []
+      xpath = "//dif:Data_Center_Name/dif:Short_Name"
+      if r = node.xpath(xpath, NAMESPACE)
+        r.each_with_index do |sn, idx|
+          if sn.text != "" and not providers.include? sn.text
+            results << Hashie::Mash.new(message: "'#{sn.text}' is not a v#{Gcmd::Concepts::VERSION} GCMD concepts provider in #{xpath}[#{idx+1}]")
+          end
+        end
+      end
+      results
     end
   
   end

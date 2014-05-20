@@ -7,6 +7,7 @@ gem "rack-cache"
 gem "uuidtools"
 gem "yajl-ruby" # https://github.com/brianmario/yajl-ruby
 gem "hashie"
+gem "nori"
 
 ## Documentation
 gem "yard"
