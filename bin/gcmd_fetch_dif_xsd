@@ -12,12 +12,12 @@ if [ ! -d "$DIF_CACHE" ]; then
   mkdir "$DIF_CACHE" --parent
 fi
 
-DIF_FILENAME="$DIF_CACHE/dif.xsd"
-DIF_FILENAME_984="$DIF_CACHE/dif_v9.8.4.xsd"
+# Conditional GET
+#curl -z "$DIF_CACHE/dif_v9.8.4.xsd" --header 'If-None-Match: "4070a0-5747-4cc594d8bb600"' --silent --fail -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd > "$DIF_CACHE/dif_v9.8.4.xsd"
 
-# Conditional GET (does not work the first time as it stands)
-#curl -z "$DIF_FILENAME" --header 'If-None-Match: "32fab1-5475-4cab3fb2f9940"'     --silent --fail -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd    > "$DIF_FILENAME"
-#curl -z "$DIF_FILENAME_984" --header 'If-None-Match: "4070a0-5747-4cc594d8bb600"' --silent --fail -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd > "$DIF_FILENAME_984"
+curl -L -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd > "$DIF_CACHE/dif_v9.8.4.xsd"
+curl -L https://cdn.earthdata.nasa.gov/dif/10.x/dif_v10.2.xsd > "$DIF_CACHE/dif_v10.2.xsd"
+curl -L -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd        > "$DIF_CACHE/dif.xsd"
 
-curl --verbose --fail -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd        > "$DIF_FILENAME"
-curl --verbose --fail -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd > "$DIF_FILENAME_984"
+echo "$DIF_CACHE"
+md5sum $DIF_CACHE/*
