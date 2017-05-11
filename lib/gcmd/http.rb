@@ -5,10 +5,10 @@ require "rack/cache"
 module Gcmd
   class Http
 
-    BASE = "http://gcmdservices.gsfc.nasa.gov"
+    BASE = "https://gcmdservices.gsfc.nasa.gov"
 
     OPTS = {
-      :request => {  } # "Agent" => "#{self.name}"
+      :request => { Agent: "https://github.com/npolar/gcmd" }
     }
     attr_accessor :log
     attr_reader :response

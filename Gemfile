@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem "faraday"
 gem "faraday_middleware"
-gem "nokogiri"
+gem "nokogiri", "1.6.7"
 gem "rack-cache"
 gem "uuidtools"
 gem "yajl-ruby" # https://github.com/brianmario/yajl-ruby

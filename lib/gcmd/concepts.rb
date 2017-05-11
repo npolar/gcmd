@@ -347,7 +347,7 @@ module Gcmd
     end
 
     def keywordVersion(scheme="root")
-      r = ng(scheme).xpath("//gcmd:keywordVersion", {"gcmd" => "http://gcmd.gsfc.nasa.gov/"}).first.text
+      r = ng(scheme).xpath("//gcmd:keywordVersion", {"gcmd" => "http://gcmd.gsfc.nasa.gov/"}).text
     end
 
     def version
