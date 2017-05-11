@@ -8,7 +8,6 @@ module Gcmd
     BASE = "https://gcmdservices.gsfc.nasa.gov"
 
     OPTS = {
-      :request => { Agent: "https://github.com/npolar/gcmd" }
     }
     attr_accessor :log
     attr_reader :response
