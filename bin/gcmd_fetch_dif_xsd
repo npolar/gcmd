@@ -17,7 +17,8 @@ fi
 
 curl -L -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.4.xsd > "$DIF_CACHE/dif_v9.8.4.xsd"
 curl -L https://cdn.earthdata.nasa.gov/dif/10.x/dif_v10.2.xsd > "$DIF_CACHE/dif_v10.2.xsd"
-curl -L -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd        > "$DIF_CACHE/dif.xsd"
+#curl -L -XGET http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd        > "$DIF_CACHE/dif.xsd"
+ln -s  "$DIF_CACHE/dif_v9.8.4.xsd" "$DIF_CACHE/dif.xsd"
 
 echo "$DIF_CACHE"
 md5sum $DIF_CACHE/*
